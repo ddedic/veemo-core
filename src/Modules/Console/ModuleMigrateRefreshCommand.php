@@ -1,5 +1,5 @@
 <?php
-namespace Caffeinated\Modules\Console;
+namespace Veemo\Core\Modules\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
@@ -14,7 +14,7 @@ class ModuleMigrateRefreshCommand extends Command
 	/**
 	 * @var string $name The console command name.
 	 */
-	protected $name = 'module:migrate-refresh';
+	protected $name = 'veemo.module:migrate-refresh';
 
 	/**
 	 * @var string $description The console command description.

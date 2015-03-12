@@ -1,8 +1,8 @@
 <?php
-namespace Caffeinated\Modules\Console;
+namespace Veemo\Core\Modules\Console;
 
-use Caffeinated\Modules\Modules;
-use Caffeinated\Modules\Traits\MigrationTrait;
+use Veemo\Core\Modules\Modules;
+use Veemo\Core\Modules\Traits\MigrationTrait;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
@@ -16,7 +16,7 @@ class ModuleMigrateRollbackCommand extends Command
 	/**
 	 * @var string $name The console command name.
 	 */
-	protected $name = 'module:migrate-rollback';
+	protected $name = 'veemo.module:migrate-rollback';
 
 	/**
 	 * @var string $description The console command description.

@@ -1,7 +1,7 @@
 <?php
-namespace Caffeinated\Modules\Console;
+namespace Veemo\Core\Modules\Console;
 
-use Caffeinated\Modules\Handlers\ModuleMakeMigrationHandler;
+use Veemo\Core\Modules\Handlers\ModuleMakeMigrationHandler;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputArgument;
 
@@ -10,7 +10,7 @@ class ModuleMakeMigrationCommand extends Command
 	/**
 	 * @var string $name The console command name.
 	 */
-	protected $name = 'module:make-migration';
+	protected $name = 'veemo.module:make-migration';
 
 	/**
 	 * @var string $description The console command description.

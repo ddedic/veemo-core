@@ -1,5 +1,5 @@
 <?php
-namespace Caffeinated\Modules;
+namespace Veemo\Core\Modules;
 
 use Caffeinated\Modules\Handlers\ModulesHandler;
 use Illuminate\Database\Migrations\Migrator;
@@ -21,8 +21,11 @@ class ModulesServiceProvider extends ServiceProvider
 	public function boot()
 	{
 		$this->publishes([
-			__DIR__.'/../../config/modules.php' => config_path('modules.php'),
+			__DIR__.'/../Publish/Config/modules.php' => config_path('modules.php'),
 		]);
+
+
+        \Debugbar::info('Veemo Core/Modules Service Provider loaded');
 	}
 
 	/**
@@ -33,7 +36,7 @@ class ModulesServiceProvider extends ServiceProvider
 	public function register()
 	{
 		$this->mergeConfigFrom(
-			__DIR__.'/../../config/modules.php', 'modules'
+			__DIR__.'/../Publish/Config/modules.php', 'modules'
 		);
 
 		$this->registerServices();
@@ -127,17 +130,17 @@ class ModulesServiceProvider extends ServiceProvider
 		$this->registerListCommand();
 
 		$this->commands([
-			'modules.make',
-			'modules.enable',
-			'modules.disable',
-			'modules.makeMigration',
-			'modules.makeRequest',
-			'modules.migrate',
-			'modules.migrateRefresh',
-			'modules.migrateReset',
-			'modules.migrateRollback',
-			'modules.seed',
-			'modules.list'
+			'veemo.modules.make',
+			'veemo.modules.enable',
+			'veemo.modules.disable',
+			'veemo.modules.makeMigration',
+			'veemo.modules.makeRequest',
+			'veemo.modules.migrate',
+			'veemo.modules.migrateRefresh',
+			'veemo.modules.migrateReset',
+			'veemo.modules.migrateRollback',
+			'veemo.modules.seed',
+			'veemo.modules.list'
 		]);
 	}
 
@@ -148,7 +151,7 @@ class ModulesServiceProvider extends ServiceProvider
 	 */
 	protected function registerEnableCommand()
 	{
-		$this->app->bindShared('modules.enable', function() {
+		$this->app->bindShared('veemo.modules.enable', function() {
 			return new Console\ModuleEnableCommand;
 		});
 	}
@@ -160,7 +163,7 @@ class ModulesServiceProvider extends ServiceProvider
 	 */
 	protected function registerDisableCommand()
 	{
-		$this->app->bindShared('modules.disable', function() {
+		$this->app->bindShared('veemo.modules.disable', function() {
 			return new Console\ModuleDisableCommand;
 		});
 	}
@@ -172,7 +175,7 @@ class ModulesServiceProvider extends ServiceProvider
 	 */
 	protected function registerMakeCommand()
 	{
-		$this->app->bindShared('modules.make', function($app) {
+		$this->app->bindShared('veemo.modules.make', function($app) {
 			$handler = new Handlers\ModuleMakeHandler($app['modules'], $app['files']);
 
 			return new Console\ModuleMakeCommand($handler);
@@ -186,7 +189,7 @@ class ModulesServiceProvider extends ServiceProvider
 	 */
 	protected function registerMakeMigrationCommand()
 	{
-		$this->app->bindShared('modules.makeMigration', function($app) {
+		$this->app->bindShared('veemo.modules.makeMigration', function($app) {
 			$handler = new Handlers\ModuleMakeMigrationHandler($app['modules'], $app['files']);
 
 			return new Console\ModuleMakeMigrationCommand($handler);
@@ -200,7 +203,7 @@ class ModulesServiceProvider extends ServiceProvider
 	 */
 	protected function registerMakeRequestCommand()
 	{
-		$this->app->bindShared('modules.makeRequest', function($app) {
+		$this->app->bindShared('veemo.modules.makeRequest', function($app) {
 			$handler = new Handlers\ModuleMakeRequestHandler($app['modules'], $app['files']);
 
 			return new Console\ModuleMakeRequestCommand($handler);
@@ -214,7 +217,7 @@ class ModulesServiceProvider extends ServiceProvider
 	 */
 	protected function registerMigrateCommand()
 	{
-		$this->app->bindShared('modules.migrate', function($app) {
+		$this->app->bindShared('veemo.modules.migrate', function($app) {
 			return new Console\ModuleMigrateCommand($app['migrator'], $app['modules']);
 		});
 	}
@@ -226,7 +229,7 @@ class ModulesServiceProvider extends ServiceProvider
 	 */
 	protected function registerMigrateRefreshCommand()
 	{
-		$this->app->bindShared('modules.migrateRefresh', function() {
+		$this->app->bindShared('veemo.modules.migrateRefresh', function() {
 			return new Console\ModuleMigrateRefreshCommand;
 		});
 	}
@@ -238,7 +241,7 @@ class ModulesServiceProvider extends ServiceProvider
 	 */
 	protected function registerMigrateResetCommand()
 	{
-		$this->app->bindShared('modules.migrateReset', function($app) {
+		$this->app->bindShared('veemo.modules.migrateReset', function($app) {
 			return new Console\ModuleMigrateResetCommand($app['modules'], $app['files'], $app['migrator']);
 		});
 	}
@@ -250,7 +253,7 @@ class ModulesServiceProvider extends ServiceProvider
 	 */
 	protected function registerMigrateRollbackCommand()
 	{
-		$this->app->bindShared('modules.migrateRollback', function($app) {
+		$this->app->bindShared('veemo.modules.migrateRollback', function($app) {
 			return new Console\ModuleMigrateRollbackCommand($app['modules']);
 		});
 	}
@@ -262,7 +265,7 @@ class ModulesServiceProvider extends ServiceProvider
 	 */
 	protected function registerSeedCommand()
 	{
-		$this->app->bindShared('modules.seed', function($app) {
+		$this->app->bindShared('veemo.modules.seed', function($app) {
 			return new Console\ModuleSeedCommand($app['modules']);
 		});
 	}
@@ -274,7 +277,7 @@ class ModulesServiceProvider extends ServiceProvider
 	 */
 	protected function registerListCommand()
 	{
-		$this->app->bindShared('modules.list', function($app) {
+		$this->app->bindShared('veemo.modules.list', function($app) {
 			return new Console\ModuleListCommand($app['modules']);
 		});
 	}

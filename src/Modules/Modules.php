@@ -1,9 +1,9 @@
 <?php
-namespace Caffeinated\Modules;
+namespace Veemo\Core\Modules;
 
 use App;
 use Countable;
-use Caffeinated\Modules\Exceptions\FileMissingException;
+use Veemo\Core\Modules\Exceptions\FileMissingException;
 use Illuminate\Config\Repository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Filesystem\Filesystem;
@@ -55,7 +55,7 @@ class Modules implements Countable
 	 *
 	 * @param  string $module
 	 * @return string
-	 * @throws \Caffeinated\Modules\Exception\FileMissingException
+	 * @throws FileMissingException
 	 */
 	protected function registerServiceProvider($module)
 	{

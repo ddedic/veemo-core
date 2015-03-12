@@ -1,5 +1,5 @@
 <?php
-namespace Caffeinated\Modules\Console;
+namespace Veemo\Core\Modules\Console;
 
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -9,7 +9,7 @@ class ModuleEnableCommand extends Command
 	/**
 	 * @var string $name The console command name.
 	 */
-	protected $name = 'module:enable';
+	protected $name = 'veemo.module:enable';
 
 	/**
 	 * @var string $description The console command description.

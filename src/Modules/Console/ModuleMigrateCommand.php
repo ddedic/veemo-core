@@ -1,7 +1,7 @@
 <?php
-namespace Caffeinated\Modules\Console;
+namespace Veemo\Core\Modules\Console;
 
-use Caffeinated\Modules\Modules;
+use Veemo\Core\Modules\Modules;
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Database\Migrations\Migrator;
@@ -17,7 +17,7 @@ class ModuleMigrateCommand extends Command
 	/**
 	 * @var string $name The console command name.
 	 */
-	protected $name = 'module:migrate';
+	protected $name = 'veemo.module:migrate';
 
 	/**
 	 * @var string $description The console command description.

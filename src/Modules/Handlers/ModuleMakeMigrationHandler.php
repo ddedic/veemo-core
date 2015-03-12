@@ -1,7 +1,7 @@
 <?php
-namespace Caffeinated\Modules\Handlers;
+namespace Veemo\Core\Modules\Handlers;
 
-use Caffeinated\Modules\Modules;
+use Veemo\Core\Modules\Modules;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;

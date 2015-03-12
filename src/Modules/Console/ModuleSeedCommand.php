@@ -1,7 +1,7 @@
 <?php
-namespace Caffeinated\Modules\Console;
+namespace Veemo\Core\Modules\Console;
 
-use Caffeinated\Modules\Modules;
+use Veemo\Core\Modules\Modules;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
@@ -12,7 +12,7 @@ class ModuleSeedCommand extends Command
 	/**
 	 * @var string $name The console command name.
 	 */
-	protected $name = 'module:seed';
+	protected $name = 'veemo.module:seed';
 
 	/**
 	 * @var string $description The console command description.

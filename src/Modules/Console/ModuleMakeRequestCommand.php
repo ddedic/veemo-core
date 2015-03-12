@@ -1,7 +1,7 @@
 <?php
-namespace Caffeinated\Modules\Console;
+namespace Veemo\Core\Modules\Console;
 
-use Caffeinated\Modules\Handlers\ModuleMakeRequestHandler;
+use Veemo\Core\Modules\Handlers\ModuleMakeRequestHandler;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputArgument;
 
@@ -10,7 +10,7 @@ class ModuleMakeRequestCommand extends Command
 	/**
 	 * @var string $name The console command name.
 	 */
-	protected $name = 'module:make-request';
+	protected $name = 'veemo.module:make-request';
 
 	/**
 	 * @var string $description The console command description.

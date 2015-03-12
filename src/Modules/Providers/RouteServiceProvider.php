@@ -1,5 +1,5 @@
 <?php
-namespace Caffeinated\Modules\Providers;
+namespace Veemo\Core\Modules\Providers;
 
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 

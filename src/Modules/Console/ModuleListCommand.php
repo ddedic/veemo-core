@@ -1,7 +1,7 @@
 <?php
-namespace Caffeinated\Modules\Console;
+namespace Veemo\Core\Modules\Console;
 
-use Caffeinated\Modules\Modules;
+use Veemo\Core\Modules\Modules;
 use Illuminate\Console\Command;
 
 class ModuleListCommand extends Command
@@ -9,7 +9,7 @@ class ModuleListCommand extends Command
 	/**
 	 * @var string $name The console command name.
 	 */
-	protected $name = 'module:list';
+	protected $name = 'veemo.module:list';
 
 	/**
 	 * @var string $description The console command description.

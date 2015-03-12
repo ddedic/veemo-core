@@ -1,5 +1,5 @@
 <?php
-namespace Caffeinated\Modules\Traits;
+namespace Veemo\Core\Modules\Traits;
 
 trait MigrationTrait
 {

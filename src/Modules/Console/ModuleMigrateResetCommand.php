@@ -1,7 +1,7 @@
 <?php
-namespace Caffeinated\Modules\Console;
+namespace Veemo\Core\Modules\Console;
 
-use Caffeinated\Modules\Modules;
+use Veemo\Core\Modules\Modules;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\Migrations\Migrator;
@@ -16,7 +16,7 @@ class ModuleMigrateResetCommand extends Command
 	/**
 	 * @var string $name The console command name.
 	 */
-	protected $name = 'module:migrate-reset';
+	protected $name = 'veemo.module:migrate-reset';
 
 	/**
 	 * @var string $description The console command description.

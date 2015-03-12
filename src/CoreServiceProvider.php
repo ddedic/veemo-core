@@ -27,6 +27,8 @@ class CoreServiceProvider extends ServiceProvider
 
 		$this->registerModules();
 
+        $this->registerConsoleCommands();
+
 
 
 	}
@@ -41,7 +43,7 @@ class CoreServiceProvider extends ServiceProvider
 
 	protected function registerModules()
 	{
-
+        $this->app->register('Veemo\Core\Modules\ModulesServiceprovider');
 	}		
 
 
@@ -59,6 +61,35 @@ class CoreServiceProvider extends ServiceProvider
 
 	}
 
+
+
+    /**
+     * Register the package console commands.
+     *
+     * @return void
+     */
+    protected function registerConsoleCommands()
+    {
+        $this->registerInstallCommand();
+
+        $this->commands([
+            'veemo.install'
+        ]);
+    }
+
+
+    /**
+     * Register the "veemo:install" console command.
+     *
+     * @return Console\InstallCommand
+     */
+    protected function registerInstallCommand()
+    {
+        $this->app->bindShared('veemo.install', function($app) {
+            $handler = new Handlers\InstallHandler();
+            return new Console\InstallCommand($handler);
+        });
+    }
 
 
 }
