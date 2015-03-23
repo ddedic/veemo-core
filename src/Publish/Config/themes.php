@@ -1,46 +1,119 @@
 <?php
 
-return [
-	
-	/*
-	|--------------------------------------------------------------------------
-	| Default Active Theme
-	|--------------------------------------------------------------------------
-	|
-	| Assign the default active theme to be used if one is not set during
-	| runtime. This is especially useful if you're developing a very basic
-	| application that does not require dynamically changing the theme.
-	|
-	*/
-
-	'active' => 'bootstrap',
-	
-	/*
-	|--------------------------------------------------------------------------
-	| Templating Engine
-	|--------------------------------------------------------------------------
-	|
-	| Switch between using either Blade or Twig as youe templating engine. To
-	| use Twig, be sure to install the twigbridge package and register its
-	| service provider BEFORE the Caffeinated Themes service provider.
-	|
-	| Available Settings: "blade", "twig"
-	|
-	*/
-
-	'engine' => 'blade',
+return array(
 
 	/*
 	|--------------------------------------------------------------------------
-	| Path to Themes
+	| Asset url path
 	|--------------------------------------------------------------------------
 	|
-	| Define the path where you'd like to store your themes. Note that if you
-	| choose a path that's outside of your public directory, you will still need
-	| to store your assets (CSS, images, etc.) within your public directory.
+	| The path to asset, this config can be cdn host.
+	| eg. http://cdn.domain.com
 	|
 	*/
 
-	'path' => public_path('themes'),
+	'assetUrl' => '/',
 
-];
+	/*
+	|--------------------------------------------------------------------------
+	| Frontend Theme Default
+	|--------------------------------------------------------------------------
+	|
+	| If you don't set a frontend theme when using a "Theme" class the default theme
+	| will replace automatically.
+	|
+	*/
+
+	'themeDefault' => 'default',
+
+	/*
+	|--------------------------------------------------------------------------
+	| Layout Default
+	|--------------------------------------------------------------------------
+	|
+	| If you don't set a layout when using a "Theme" class the default layout
+	| will replace automatically.
+	|
+	*/
+
+	'layoutDefault' => 'default',
+
+	/*
+	|--------------------------------------------------------------------------
+	| Path to lookup theme
+	|--------------------------------------------------------------------------
+	|
+	| The root path contains themes collections.
+	|
+	*/
+
+	'themeDir' => public_path('themes'),
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Modules Path
+    |--------------------------------------------------------------------------
+    |
+    | Here, you set the path (relative to your theme's root folder) for all
+    | modules to reside.
+    |
+    */
+
+    'modulesDir' => 'modules',
+
+
+	/*
+	|--------------------------------------------------------------------------
+	| A pieces of theme collections
+	|--------------------------------------------------------------------------
+	|
+	| Inside a theme path we need to set up directories to
+	| keep "layouts", "assets" and "partials".
+	|
+	*/
+
+	'containerDir' => array(
+		'layout'  => 'layouts',
+		'asset'   => 'assets',
+		'partial' => 'partials',
+		'view'    => 'views'
+	),
+
+
+
+	/*
+	|--------------------------------------------------------------------------
+	| Listener from events
+	|--------------------------------------------------------------------------
+	|
+	| You can hook a theme when event fired on activities
+	| this is cool feature to set up a title, meta, default styles and scripts.
+	|
+	*/
+
+	'events' => array(
+
+		// Before all event, this event will effect for global.
+		'before' => function($theme)
+		{
+			//$theme->setTitle('Something in global.');
+		},
+
+		// This event will fire as a global you can add any assets you want here.
+		'asset' => function($asset)
+		{
+			// Preparing asset you need to serve after.
+            $asset->cook('backbone', function($asset)
+            {
+                //$asset->add('backbone', '//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.0.0/backbone-min.js');
+                //$asset->add('underscorejs', '//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js');
+            });
+
+            // To use cook 'backbone' you can fire with 'serve' method.
+            // Theme::asset()->serve('backbone');
+		}
+
+	)
+
+);

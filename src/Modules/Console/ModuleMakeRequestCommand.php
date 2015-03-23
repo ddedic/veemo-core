@@ -10,7 +10,7 @@ class ModuleMakeRequestCommand extends Command
 	/**
 	 * @var string $name The console command name.
 	 */
-	protected $name = 'veemo.module:make-request';
+	protected $name = 'veemo:module:make-request';
 
 	/**
 	 * @var string $description The console command description.
@@ -18,14 +18,14 @@ class ModuleMakeRequestCommand extends Command
 	protected $description = 'Create a new module form request class';
 
 	/**
-	 * @var \Caffeinated\Modules\Handlers\ModuleMakeRequestHandler
+	 * @var \Veemo\Core\Modules\Handlers\ModuleMakeRequestHandler
 	 */
 	protected $handler;
 
 	/**
 	 * Create a new command instance.
 	 *
-	 * @param \Caffeinated\Modules\Handlers\ModuleMakeRequestHandler $handler
+	 * @param \Veemo\Core\Modules\Handlers\ModuleMakeRequestHandler $handler
 	 */
 	public function __construct(ModuleMakeRequestHandler $handler)
 	{

@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 class ModuleMakeRequestHandler
 {
 	/**
-	 * @var \Caffeinated\Modules\Modules
+	 * @var \Veemo\Core\Modules\Modules
 	 */
 	protected $module;
 
@@ -36,7 +36,7 @@ class ModuleMakeRequestHandler
 	/**
 	 * Constructor method.
 	 *
-	 * @param \Caffeinated\Modules\Modules      $module
+	 * @param \Veemo\Core\Modules\Modules      $module
 	 * @param \Illuminate\Filesystem\Filesystem $finder
 	 */
 	public function __construct(Modules $module, Filesystem $finder)

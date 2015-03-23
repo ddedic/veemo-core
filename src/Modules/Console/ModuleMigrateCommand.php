@@ -17,7 +17,7 @@ class ModuleMigrateCommand extends Command
 	/**
 	 * @var string $name The console command name.
 	 */
-	protected $name = 'veemo.module:migrate';
+	protected $name = 'veemo:module:migrate';
 
 	/**
 	 * @var string $description The console command description.
@@ -25,7 +25,7 @@ class ModuleMigrateCommand extends Command
 	protected $description = 'Run the database migrations for a specific or all modules';
 
 	/**
-	 * @var \Caffeinated\Modules\Modules
+	 * @var \Veemo\Core\Modules\Modules
 	 */
 	protected $module;
 
@@ -38,7 +38,7 @@ class ModuleMigrateCommand extends Command
 	 * Create a new command instance.
 	 *
 	 * @param \Illuminate\Database\Migrations\Migrator $migrator
-	 * @param \Caffeinated\Modules\Modules             $module
+	 * @param \Veemo\Core\Modules\Modules             $module
 	 */
 	public function __construct(Migrator $migrator, Modules $module)
 	{

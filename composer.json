@@ -1,8 +1,8 @@
 {
-    "name": "veemo/core",
+    "name": "ddedic/veemo-core",
     "description": "Veemo Core package",
     "keywords": [
-        "veemo"
+        "veemo", "core"
     ],
     "homepage": "https://github.com/ddedic/veemo-core",
     "license": "MIT",
@@ -29,7 +29,12 @@
     "autoload": {
         "psr-4": {
             "Veemo\\Core\\": "src"
-        }
+        },
+        "classmap": [
+        ],
+
+        "files": [
+        ]
     },
     "autoload-dev": {
         "psr-4": {

@@ -54,7 +54,7 @@ class ModuleMakeHandler
 	];
 
 	/**
-	 * @var \Caffeinated\Modules\Modules
+	 * @var \Veemo\Core\Modules\Modules
 	 */
 	protected $module;
 
@@ -76,7 +76,7 @@ class ModuleMakeHandler
 	/**
 	 * Constructor method.
 	 *
-	 * @param \Caffeinated\Modules\Modules      $module
+	 * @param \Veemo\Core\Modules\Modules      $module
 	 * @param \Illuminate\Filesystem\Filesystem $finder
 	 */
 	public function __construct(Modules $module, Filesystem $finder)
@@ -88,7 +88,7 @@ class ModuleMakeHandler
 	/**
 	 * Fire off the handler.
 	 *
-	 * @param  \Caffeinated\Modules\Console\ModuleMakeCommand $console
+	 * @param  \Veemo\Core\Modules\Console\ModuleMakeCommand $console
 	 * @param  string                                         $slug
 	 * @return bool
 	 */
@@ -110,7 +110,7 @@ class ModuleMakeHandler
 	/**
 	 * Generate module folders and files.
 	 *
-	 * @param  \Caffeinated\Modules\Console\ModuleMakeCommand $console
+	 * @param  \Veemo\Core\Modules\Console\ModuleMakeCommand $console
 	 * @return boolean
 	 */
 	public function generate(Command $console)

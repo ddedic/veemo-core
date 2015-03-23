@@ -1,7 +1,7 @@
 <?php
 namespace Veemo\Core\Modules;
 
-use Caffeinated\Modules\Handlers\ModulesHandler;
+use Veemo\Core\Modules\Handlers\ModulesHandler;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 use Illuminate\Support\ServiceProvider;
@@ -36,7 +36,7 @@ class ModulesServiceProvider extends ServiceProvider
 	public function register()
 	{
 		$this->mergeConfigFrom(
-			__DIR__.'/../Publish/Config/modules.php', 'modules'
+			__DIR__.'/../Publish/Config/modules.php', 'veemo.modules'
 		);
 
 		$this->registerServices();

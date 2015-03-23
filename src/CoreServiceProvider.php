@@ -2,65 +2,68 @@
 
 use App, Config, Lang, View;
 use Illuminate\Support\ServiceProvider;
-
-use Caffeinated\Modules\ModulesServiceProvider;
+use Illuminate\Foundation\AliasLoader;
 
 
 class CoreServiceProvider extends ServiceProvider
 {
 
-	/**
-	 * @var bool $defer Indicates if loading of the provider is deferred.
-	 */
-	protected $defer = false;
+    /**
+     * @var bool $defer Indicates if loading of the provider is deferred.
+     */
+    protected $defer = false;
 
 
+    /**
+     * Register the Core module service provider.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        $this->registerNamespaces();
 
-	/**
-	 * Register the Core module service provider.
-	 *
-	 * @return void
-	 */
-	public function register()
-	{
-		$this->registerNamespaces();
+        $this->registerModules();
 
-		$this->registerModules();
+        $this->registerThemes();
 
         $this->registerConsoleCommands();
 
 
-
-	}
-
-
-	public function boot()
-	{
-		\Debugbar::info('Veemo Core Service Provider loaded');
-	}
-
-		
-
-	protected function registerModules()
-	{
-        $this->app->register('Veemo\Core\Modules\ModulesServiceprovider');
-	}		
+    }
 
 
+    public function boot()
+    {
+        \Debugbar::info('Veemo Core Service Provider loaded');
+    }
 
 
-	/**
-	 * Register the Core module resource namespaces.
-	 *
-	 * @return void
-	 */
-	protected function registerNamespaces()
-	{
+    protected function registerModules()
+    {
+        $this->app->register('Veemo\Core\Modules\ModulesServiceProvider');
+        AliasLoader::getInstance()->alias('Module', 'Veemo\Core\Modules\Facades\Module');
+    }
 
-		//
 
-	}
+    protected function registerThemes()
+    {
+        $this->app->register('Veemo\Core\Themes\ThemeServiceProvider');
+        AliasLoader::getInstance()->alias('Theme', 'Veemo\Core\Themes\Facades\Theme');
+    }
 
+
+    /**
+     * Register the Core module resource namespaces.
+     *
+     * @return void
+     */
+    protected function registerNamespaces()
+    {
+
+        //
+
+    }
 
 
     /**
@@ -85,7 +88,7 @@ class CoreServiceProvider extends ServiceProvider
      */
     protected function registerInstallCommand()
     {
-        $this->app->bindShared('veemo.install', function($app) {
+        $this->app->bindShared('veemo.install', function ($app) {
             $handler = new Handlers\InstallHandler();
             return new Console\InstallCommand($handler);
         });

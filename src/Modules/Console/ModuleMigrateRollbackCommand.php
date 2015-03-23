@@ -16,7 +16,7 @@ class ModuleMigrateRollbackCommand extends Command
 	/**
 	 * @var string $name The console command name.
 	 */
-	protected $name = 'veemo.module:migrate-rollback';
+	protected $name = 'veemo:module:migrate-rollback';
 
 	/**
 	 * @var string $description The console command description.
@@ -24,14 +24,14 @@ class ModuleMigrateRollbackCommand extends Command
 	protected $description = 'Rollback the last database migrations for a specific or all modules';
 
 	/**
-	 * @var \Caffeinated\Modules\Modules
+	 * @var \Veemo\Core\Modules\Modules
 	 */
 	protected $module;
 
 	/**
 	 * Create a new command instance.
 	 *
-	 * @param \Caffeinated\Modules\Modules $module
+	 * @param \Veemo\Core\Modules\Modules $module
 	 */
 	public function __construct(Modules $module)
 	{

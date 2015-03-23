@@ -14,7 +14,7 @@ class ModuleMigrateRefreshCommand extends Command
 	/**
 	 * @var string $name The console command name.
 	 */
-	protected $name = 'veemo.module:migrate-refresh';
+	protected $name = 'veemo:module:migrate-refresh';
 
 	/**
 	 * @var string $description The console command description.

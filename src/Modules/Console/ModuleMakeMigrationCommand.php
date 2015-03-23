@@ -10,7 +10,7 @@ class ModuleMakeMigrationCommand extends Command
 	/**
 	 * @var string $name The console command name.
 	 */
-	protected $name = 'veemo.module:make-migration';
+	protected $name = 'veemo:module:make-migration';
 
 	/**
 	 * @var string $description The console command description.
@@ -18,14 +18,14 @@ class ModuleMakeMigrationCommand extends Command
 	protected $description = 'Create a new module migration file';
 
 	/**
-	 * @var \Caffeinated\Modules\Handlers\ModuleMakeMigrationHandler
+	 * @var \Veemo\Core\Modules\Handlers\ModuleMakeMigrationHandler
 	 */
 	protected $handler;
 
 	/**
 	 * Create a new command instance.
 	 *
-	 * @param \Caffeinated\Modules\Handlers\ModuleMakeMigrationHandler $handler
+	 * @param \Veemo\Core\Modules\Handlers\ModuleMakeMigrationHandler $handler
 	 */
 	public function __construct(ModuleMakeMigrationHandler $handler)
 	{

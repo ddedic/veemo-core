@@ -172,7 +172,7 @@ class Modules implements Countable
 	 */
 	public function getPath()
 	{
-		return $this->path ?: $this->config->get('modules.path');
+		return $this->path ?: $this->config->get('veemo.modules.path');
 	}
 
 	/**
@@ -195,7 +195,7 @@ class Modules implements Countable
 	 */
 	public function getNamespace()
 	{
-		return $this->config->get('modules.namespace');
+		return $this->config->get('veemo.modules.namespace');
 	}
 
 	/**

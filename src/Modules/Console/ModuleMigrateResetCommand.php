@@ -16,7 +16,7 @@ class ModuleMigrateResetCommand extends Command
 	/**
 	 * @var string $name The console command name.
 	 */
-	protected $name = 'veemo.module:migrate-reset';
+	protected $name = 'veemo:module:migrate-reset';
 
 	/**
 	 * @var string $description The console command description.
@@ -24,7 +24,7 @@ class ModuleMigrateResetCommand extends Command
 	protected $description = 'Rollback all database migrations for a specific or all modules';
 
 	/**
-	 * @var \Caffeinated\Modules\Modules
+	 * @var \Veemo\Core\Modules\Modules
 	 */
 	protected $module;
 
@@ -41,7 +41,7 @@ class ModuleMigrateResetCommand extends Command
 	/**
 	 * Create a new command instance.
 	 *
-	 * @param \Caffeinated\Modules\Modules             $module
+	 * @param \Veemo\Core\Modules\Modules             $module
 	 * @param \Illuminate\Filesystem\Filesystem        $files
 	 * @param \Illuminate\Database\Migrations\Migrator $migrator
 	 */

@@ -9,7 +9,7 @@ class ModuleDisableCommand extends Command
 	/**
 	 * @var string $name The console command name.
 	 */
-	protected $name = 'veemo.module:disable';
+	protected $name = 'veemo:module:disable';
 
 	/**
 	 * @var string $description The console command description.

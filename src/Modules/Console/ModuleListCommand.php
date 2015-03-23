@@ -9,7 +9,7 @@ class ModuleListCommand extends Command
 	/**
 	 * @var string $name The console command name.
 	 */
-	protected $name = 'veemo.module:list';
+	protected $name = 'veemo:module:list';
 
 	/**
 	 * @var string $description The console command description.
@@ -17,7 +17,7 @@ class ModuleListCommand extends Command
 	protected $description = 'List all application modules';
 
 	/**
-	 * @var \Caffeinated\Modules\Modules
+	 * @var \Veemo\Core\Modules\Modules
 	 */
 	protected $module;
 
@@ -29,7 +29,7 @@ class ModuleListCommand extends Command
 	/**
 	 * Create a new command instance.
 	 *
-	 * @param \Caffeinated\Modules\Modules $module
+	 * @param \Veemo\Core\Modules\Modules $module
 	 */
 	public function __construct(Modules $module)
 	{

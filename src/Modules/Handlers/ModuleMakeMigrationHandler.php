@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 class ModuleMakeMigrationHandler
 {
 	/**
-	 * @var \Caffeinated\Modules\Modules
+	 * @var \Veemo\Core\Modules\Modules
 	 */
 	protected $module;
 
@@ -46,7 +46,7 @@ class ModuleMakeMigrationHandler
 	/**
 	 * Constructor method.
 	 *
-	 * @param \Caffeinated\Modules\Modules      $module
+	 * @param \Veemo\Core\Modules\Modules      $module
 	 * @param \Illuminate\Filesystem\Filesystem $finder
 	 */
 	public function __construct(Modules $module, Filesystem $finder)
@@ -58,7 +58,7 @@ class ModuleMakeMigrationHandler
 	/**
 	 * Fire off the handler.
 	 *
-	 * @param  \Caffeinated\Modules\Console\ModuleMakeMigrationCommand $console
+	 * @param  \Veemo\Core\Modules\Console\ModuleMakeMigrationCommand $console
 	 * @param  string                                                  $slug
 	 * @return string
 	 */

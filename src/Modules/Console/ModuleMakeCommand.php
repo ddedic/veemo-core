@@ -10,7 +10,7 @@ class ModuleMakeCommand extends Command
 	/**
 	 * @var string $name The console command name.
 	 */
-	protected $name = 'veemo.module:make';
+	protected $name = 'veemo:module:make';
 
 	/**
 	 * @var string $description The console command description.
@@ -18,14 +18,14 @@ class ModuleMakeCommand extends Command
 	protected $description = 'Create a new module';
 
 	/**
-	 * @var \Caffeinated\Modules\Handlers\ModuleMakeHandler
+	 * @var \Veemo\Core\Modules\Handlers\ModuleMakeHandler
 	 */
 	protected $handler;
 
 	/**
 	 * Create a new command instance.
 	 *
-	 * @param \Caffeinated\Modules\Handlers\ModuleMakeHandler $handler
+	 * @param \Veemo\Core\Modules\Handlers\ModuleMakeHandler $handler
 	 */
 	public function __construct(ModuleMakeHandler $handler)
 	{
