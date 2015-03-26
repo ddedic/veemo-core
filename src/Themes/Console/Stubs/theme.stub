@@ -10,6 +10,6 @@
         "author_email" : "dedic.d@gmail.com",
         "author_website" : "http://ddedic.com",
 
-        "parent" : "",
+        "parent" : null,
         "defaultLayout" : "default"
 }

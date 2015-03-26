@@ -48,7 +48,7 @@ class ThemeManager
      * @param bool $enabled
      * @return mixed
      */
-    public function getFrontendThemes($enabled = true)
+    public function frontend($enabled = true)
     {
         return $this->adapter->getFrontend($enabled);
     }
@@ -57,7 +57,7 @@ class ThemeManager
      * @param bool $enabled
      * @return mixed
      */
-    public function getBackendThemes($enabled = true)
+    public function backend($enabled = true)
     {
         return $this->adapter->getBackend($enabled);
     }
@@ -66,7 +66,7 @@ class ThemeManager
     /**
      * @return mixed
      */
-    public function getAllThemes()
+    public function all()
     {
         return $this->adapter->getAll();
     }
@@ -76,7 +76,7 @@ class ThemeManager
      */
     public function dummy()
     {
-        return $this->adapter->enabled();
+        return 'Dummy method';
     }
 
 }

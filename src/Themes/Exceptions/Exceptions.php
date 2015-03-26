@@ -1,7 +1,5 @@
-<?php namespace Veemo\Core\Themes;
+<?php namespace Veemo\Core\Themes\Exceptions;
 
-class UnknownThemeException extends \UnexpectedValueException {}
-class UnknownViewFileException extends \UnexpectedValueException {}
 class UnknownLayoutFileException extends \UnexpectedValueException {}
 class UnknownWidgetFileException extends \UnexpectedValueException {}
 class UnknownWidgetClassException extends \UnexpectedValueException {}

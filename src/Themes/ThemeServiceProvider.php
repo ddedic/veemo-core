@@ -43,7 +43,7 @@ class ThemeServiceProvider extends ServiceProvider
         $this->registerThemeManager();
 
         // Register theme
-        //$this->registerTheme();
+        $this->registerTheme();
 
         // Register commands
         //$this->registerThemeGenerator();
@@ -60,13 +60,12 @@ class ThemeServiceProvider extends ServiceProvider
 
     public function registerThemeManager()
     {
-        $this->app['theme.manager'] = $this->app->share(function ($app) {
-            $adapter = new Adapters\FileManagerAdapter($app['files'], $app['config']);
+        $this->app['veemo.theme.manager'] = $this->app->share(function ($app) {
+            $adapter = new Adapters\DummyManagerAdapter($app['files'], $app['config']);
 
             return new ThemeManager($adapter, $app['config']);
         });
     }
-
 
 
     /**
@@ -76,9 +75,15 @@ class ThemeServiceProvider extends ServiceProvider
      */
     public function registerTheme()
     {
-        $this->app['theme'] = $this->app->share(function ($app) {
-            return new Theme($app['config'], $app['events'], $app['view'], $app['asset'], $app['files']);
+
+        $this->app->bindShared('veemo.themes', function ($app) {
+            return new Themes($app['veemo.theme.manager'],$app['files'], $app['config'], $app['view']);
         });
+
+        $this->app->booting(function ($app) {
+            $app['veemo.themes']->register();
+        });
+
     }
 
 
@@ -114,7 +119,7 @@ class ThemeServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array('theme');
+        return array('veemo.themes');
     }
 
 }

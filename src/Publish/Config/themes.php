@@ -16,10 +16,10 @@ return array(
 
 	/*
 	|--------------------------------------------------------------------------
-	| Frontend Theme Default
+	| Theme Default
 	|--------------------------------------------------------------------------
 	|
-	| If you don't set a frontend theme when using a "Theme" class the default theme
+	| If you don't set a theme when using a "Theme" class the default theme
 	| will replace automatically.
 	|
 	*/
@@ -61,24 +61,6 @@ return array(
     */
 
     'modulesDir' => 'modules',
-
-
-	/*
-	|--------------------------------------------------------------------------
-	| A pieces of theme collections
-	|--------------------------------------------------------------------------
-	|
-	| Inside a theme path we need to set up directories to
-	| keep "layouts", "assets" and "partials".
-	|
-	*/
-
-	'containerDir' => array(
-		'layout'  => 'layouts',
-		'asset'   => 'assets',
-		'partial' => 'partials',
-		'view'    => 'views'
-	),
 
 
 
