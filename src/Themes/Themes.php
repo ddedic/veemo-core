@@ -290,8 +290,7 @@ class Themes
      */
     public function location($realpath = false)
     {
-        if ($this->viewFactory->exists($this->content))
-        {
+        if ($this->viewFactory->exists($this->content)) {
             return ($realpath) ? $this->viewFactory->getFinder()->find($this->content) : $this->content;
         }
     }
@@ -585,7 +584,7 @@ class Themes
             $partialViews['module'] = $this->getModuleView("modules.{$module}.partials.{$view}");
 
             // Check base
-            $partialViews['base'] = $module . '/partials/' . $view ;
+            $partialViews['base'] = $module . '/partials/' . $view;
 
 
         } else {
@@ -612,8 +611,7 @@ class Themes
 
         //dd($partialViews);
 
-        if ( $partial == null)
-        {
+        if ($partial == null) {
             throw new UnknownPartialFileException("Partial view [$view] not found.");
         }
 
@@ -624,7 +622,7 @@ class Themes
      * Load a partial
      *
      * @param  string $view
-     * @param  array  $args
+     * @param  array $args
      * @throws UnknownPartialFileException
      * @return mixed
      */
