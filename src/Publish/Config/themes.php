@@ -26,6 +26,19 @@ return array(
 
 	'themeDefault' => 'default',
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Theme Type Default
+    |--------------------------------------------------------------------------
+    |
+    | If you don't set a theme when using a "Theme" class the default theme type
+    | will replace automatically.
+    |
+    */
+
+    'themeDefaultType' => 'frontend',
+
 	/*
 	|--------------------------------------------------------------------------
 	| Layout Default
@@ -47,7 +60,10 @@ return array(
 	|
 	*/
 
-	'themeDir' => public_path('themes'),
+	'themeDir' => [
+        'frontend' => public_path('themes/frontend'),
+        'backend'  => public_path('themes/backend')
+    ],
 
 
     /*

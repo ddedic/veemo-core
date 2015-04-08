@@ -645,7 +645,9 @@ class Theme {
 	}
 
 	/**
-     * Watch and set up a partial from anywhere.
+     *
+     *
+     * and set up a partial from anywhere.
      *
      * This method will first try to load the partial from current theme. If partial
      * is not found in theme then it loads it from app (i.e. app/views/partials)
@@ -1108,7 +1110,7 @@ class Theme {
 
 		// Layout directory.
 		$layoutDir = $this->getConfig('containerDir.layout');
-
+“
 		$path = $this->getThemeNamespace($layoutDir.'.'.$this->layout);
 
 		if ( ! $this->view->exists($path))

@@ -35,7 +35,7 @@ class CoreServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        \Debugbar::info('Veemo Core Service Provider loaded');
+        //\Debugbar::info('Veemo Core Service Provider loaded');
     }
 
 

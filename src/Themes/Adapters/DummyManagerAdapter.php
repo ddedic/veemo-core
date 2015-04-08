@@ -67,7 +67,23 @@ class DummyManagerAdapter implements ThemeManagerAdapterInterface
      */
     public function getFrontend($enabled = true)
     {
-        // TODO: Implement getFrontend() method.
+
+        $themes = [
+            'Default' => [
+                'slug' => 'default',
+                'type' => 'frontend',
+                'enabled' => true
+            ],
+
+            'test' => [
+                'slug' => 'test',
+                'type' => 'frontend',
+                'enabled' => true
+            ]
+        ];
+
+        return new Collection($themes);
+
     }
 
     /**
@@ -76,7 +92,17 @@ class DummyManagerAdapter implements ThemeManagerAdapterInterface
      */
     public function getBackend($enabled = true)
     {
-        // TODO: Implement getBackend() method.
+        $themes = [
+
+            'AdminLTE' => [
+                'slug' => 'adminlte',
+                'type' => 'backend',
+                'enabled' => true
+            ]
+        ];
+
+        return new Collection($themes);
+
     }
 
     /**

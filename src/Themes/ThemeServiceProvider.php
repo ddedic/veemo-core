@@ -81,7 +81,7 @@ class ThemeServiceProvider extends ServiceProvider
         });
 
         $this->app->booting(function ($app) {
-            $app['veemo.themes']->register();
+            //$app['veemo.themes']->register();
         });
 
     }

@@ -17,6 +17,9 @@ use Illuminate\View\Factory as ViewFactory;
 
 use Veemo\Core\Themes\Exceptions\UnknownThemeException;
 use Veemo\Core\Themes\Exceptions\UnknownViewFileException;
+use Veemo\Core\Themes\Exceptions\UnknownLayoutFileException;
+use Veemo\Core\Themes\Exceptions\UnknownPartialFileException;
+
 
 /**
  * Class Themes
@@ -38,6 +41,39 @@ class Themes
      * @var string
      */
     protected $layout;
+
+    /**
+     * Regions in the theme.
+     *
+     * @var array
+     */
+    protected $regions = array();
+
+    /**
+     * Content arguments.
+     *
+     * @var array
+     */
+    protected $arguments = array();
+
+    /**
+     * Data bindings.
+     *
+     * @var array
+     */
+    protected $bindings = array();
+
+    /**
+     * Content dot path.
+     *
+     * @var string
+     */
+    protected $content;
+
+    /**
+     * @var string
+     */
+    protected $type;
 
     /**
      * @var ThemeManager;
@@ -91,19 +127,41 @@ class Themes
         $this->files = $files;
         $this->viewFactory = $viewFactory;
 
-
-        $this->active = $this->getConfig('themeDefault');
-
+        $this->active = $this->getActive();
+        $this->layout = $this->getLayout();
+        $this->type = $this->getType();
     }
 
     /**
-     * Register custom namespaces for all themes.
+     * Register theme
      *
      * @return null
      */
-    public function register()
+    public function registers()
     {
         $this->uses($this->getActive());
+    }
+
+
+    /**
+     * @return $this
+     */
+    public function frontend()
+    {
+        $this->type = 'frontend';
+
+        return $this;
+    }
+
+
+    /**
+     * @return $this
+     */
+    public function backend()
+    {
+        $this->type = 'backend';
+
+        return $this;
     }
 
 
@@ -119,121 +177,125 @@ class Themes
             $this->active = $theme;
         }
 
+
         // Is theme ready?
         if (!$this->exists($theme)) {
             throw new UnknownThemeException("Theme [$theme] not found.");
         }
 
+        // Load theme config
+        $this->themeConfig = $this->getThemeConfig();
+
+        // Set default theme layout
+        $this->layout = $this->getThemeConfig('default_layout');
+
+
         // Add location to look up view.
         $this->addPathLocation($this->path() . '/views');
 
-        //dd($this->path() . '/views');
-
-        // Fire event before set up a theme.
-        //$this->fire('before', $this);
-
-        // Before from a public theme config.
-        //$this->fire('appendBefore', $this);
-
-        // Add asset path to asset container.
-        //$this->asset->addPath($this->path().'/'.$this->getConfig('containerDir.asset'));
 
         return $this;
 
     }
 
-    /**
-     * Get theme path.
-     *
-     * @param  string $forceThemeName
-     * @return string
-     */
-    public function path($forceThemeName = null)
-    {
-        $themeDir = $this->getConfig('themeDir');
-
-        $theme = $this->active;
-
-        if ($forceThemeName != false) {
-            $theme = $forceThemeName;
-        }
-
-        return $themeDir . '/' . $theme;
-    }
 
     /**
-     * Add location path to look up.
+     * Render theme view file.
      *
-     * @param string $location
+     * @param string $view
+     * @param array $data
+     * @param int $statusCode
+     * @return View
      */
-    protected function addPathLocation($location)
+    public function view($view, $data = array(), $statusCode = 200)
     {
-        // First path is in the selected theme.
-        $hints[] = $location;
+        //dd($this->viewFactory->getFinder());
 
+        $viewNamespace = null;
 
-        // This is nice feature to use inherit from another.
-        if ($this->getConfig('parent')) {
-            // Inherit from theme name.
-            $parent = $this->getConfig('parent') . '/views';
+        // MAIN THEME / PARENT THEME
+        $views['theme'] = $this->getThemeNamespace($view);
 
-            // Inherit theme path.
-            $parentPath = $this->path($parent);
+        // MODULE
+        $views['module'] = $this->getModuleView($view);
 
-            if ($this->files->isDirectory($parentPath)) {
-                array_push($hints, $parentPath);
+        // BASE
+        $views['base'] = $view;
+
+        /*
+        echo "<pre>";
+        print_r($views);
+        print_r($this->viewFactory->getFinder());
+        echo "</pre>";
+        echo "<hr />";
+        echo "<br />";
+        */
+
+        foreach ($views as $view) {
+
+            if ($this->viewFactory->exists($view)) {
+                $viewNamespace = $view;
+                break;
             }
         }
 
 
-        //dd($hints);
-
-        // Add namespace with hinting paths.
-        $this->viewFactory->addNamespace($this->getThemeNamespace(), $hints);
-    }
-
-
-
-
-    /**
-     * Check if given theme exists.
-     *
-     * @param  string $theme
-     * @return bool
-     */
-    public function exists($theme)
-    {
-        $themes = $this->manager->all();
-
-        foreach ($themes as $name => $config) {
-            if (strtolower($theme) == strtolower($name))
-                return true;
+        if ($viewNamespace == null) {
+            throw new UnknownViewFileException(("Theme [$this->active] View [$view] not found."));
         }
 
-    }
 
-    /**
-     * Gets themes path.
-     *
-     * @return string
-     */
-    public function getPath()
-    {
-        return $this->path ?: $this->config->get('veemo.themes.themeDir');
-    }
+        $content = $this->viewFactory->make($viewNamespace, $data)->render();
 
-    /**
-     * Sets themes path.
-     *
-     * @param string $path
-     * @return self
-     */
-    public function setPath($path)
-    {
-        $this->path = $path;
+        // View path of content.
+        $this->content = $view;
+
+
+        // Set up a content regional.
+        $this->regions['content'] = $content;
+
 
         return $this;
     }
+
+
+    /**
+     * Return a template with content.
+     *
+     * @param  integer $statusCode
+     * @throws UnknownLayoutFileException
+     * @return Response
+     */
+    public function render($statusCode = 200)
+    {
+        $path = $this->getThemeNamespace('layouts.' . $this->layout);
+
+        if (!$this->viewFactory->exists($path)) {
+            throw new UnknownLayoutFileException("Layout [$this->layout] not found.");
+        }
+
+        $content = $this->viewFactory->make($path)->render();
+
+        // Append status code to view.
+        $content = new Response($content, $statusCode);
+
+        return $content;
+    }
+
+    /**
+     * Find view location.
+     *
+     * @param  boolean $realpath
+     * @return string
+     */
+    public function location($realpath = false)
+    {
+        if ($this->viewFactory->exists($this->content))
+        {
+            return ($realpath) ? $this->viewFactory->getFinder()->find($this->content) : $this->content;
+        }
+    }
+
 
     /**
      * Gets active theme.
@@ -245,183 +307,68 @@ class Themes
         return $this->active ?: $this->config->get('veemo.themes.themeDefault');
     }
 
-    /**
-     * Sets active theme.
-     *
-     * @return Themes
-     */
-    public function setActive($theme)
-    {
-        $this->active = $theme;
-
-        return $this;
-    }
 
     /**
-     * Get theme layout.
+     * Gets active layout.
      *
      * @return string
      */
     public function getLayout()
     {
-        return $this->layout;
+        return $this->layout ?: $this->config->get('veemo.themes.layoutDefault');
     }
 
     /**
-     * Sets theme layout.
+     * Set up a layout name.
      *
-     * @return Themes
+     * @param  string $layout
+     * @return Theme
      */
-    public function setLayout($layout)
+    public function layout($layout)
     {
-        $this->layout = $this->getThemeNamespace($layout);
+        // If layout name is not set, so use default from config.
+        if ($layout != false) {
+            $this->layout = $layout;
+        }
 
         return $this;
     }
 
     /**
-     * Render theme view file.
+     * Gets active theme.
      *
-     * @param string $view
-     * @param array $data
-     * @return View
-     */
-    public function view($view, $data = array())
-    {
-        $parent = null;
-        $viewNamespace = null;
-
-
-        // MAIN THEME
-        $views['theme'] = $this->getThemeNamespace($view);
-
-        // PARENT THEME
-        $views['parent'] = $this->getThemeParentNamespace($view);
-
-        // MODULE
-        $views['module'] = $this->getModuleView($view);
-
-        // BASE
-        $views['base'] = $view;
-
-        //dd($views);
-
-        foreach ($views as $view) {
-
-            if ($this->viewFactory->exists($view)) {
-                $viewNamespace = $view;
-                break;
-            }
-        }
-
-
-        if($viewNamespace == null)
-            throw new UnknownViewFileException(("View [$view] not found."));
-        else
-            return $this->renderView($viewNamespace, $data);
-
-    }
-
-    /**
-     * Renders the defined view.
-     *
-     * @param  string $view
-     * @param  mixed $data
-     * @return viewFactory
-     */
-    protected function renderView($view, $data)
-    {
-        //$this->autoloadComponents($this->getActive());
-
-        if (!is_null($this->layout)) {
-            $data['theme_layout'] = $this->getLayout();
-        }
-
-        return $this->viewFactory->make($view, $data);
-
-    }
-
-    /**
-     * Return a new theme view response from the application.
-     *
-     * @param  string $view
-     * @param  array $data
-     * @param  int $status
-     * @param  array $headers
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function response($view, $data = array(), $status = 200, array $headers = array())
-    {
-        return new Response($this->view($view, $data), $status, $headers);
-    }
-
-    /**
-     * Gets the specified themes path.
-     *
-     * @param string $theme
      * @return string
      */
-    public function getThemePath($theme)
+    public function getType()
     {
-        return $this->getPath() . "/{$theme}/";
+        return $this->type ?: $this->config->get('veemo.themes.themeDefaultType');
     }
 
-
     /**
-     * Autoload a themes compontents file.
+     * Check if given theme exists.
      *
      * @param  string $theme
-     * @return null
+     * @return bool
      */
-    protected function autoloadComponents($theme)
+    public function exists($theme)
     {
-        $activeTheme = $this->getActive();
-        $path = $this->getPath();
-        $parent = null;//$this->getProperty($activeTheme.'::parent');
-        $themePath = $path . '/' . $theme;
-        $componentsFilePath = $themePath . '/components.php';
+        $themes = [];
 
-        if (!empty($parent)) {
-            $parentPath = $path . '/' . $parent;
-            $parentComponentsFilePath = $parentPath . '/components.php';
+        if ($this->type == 'frontend') {
+            $themes = $this->manager->frontend()->toArray();
 
-            if (file_exists($parentPath)) {
-                include($parentComponentsFilePath);
-            }
+        } elseif ($this->type == 'backend') {
+            $themes = $this->manager->backend()->toArray();
         }
 
-        if (file_exists($componentsFilePath)) {
-            include($componentsFilePath);
+
+        foreach ($themes as $name => $config) {
+            if (strtolower($theme) == strtolower($name))
+                return true;
         }
+
     }
 
-    /**
-     * Get module view file.
-     *
-     * @param  string $view
-     * @return null|string
-     */
-    protected function getModuleView($view)
-    {
-        if (app('Veemo\Core\Modules\Modules')) {
-            $viewSegments = explode('.', $view);
-
-            if ($viewSegments[0] == 'modules') {
-                $module = $viewSegments[1];
-                $view = implode('.', array_slice($viewSegments, 2));
-
-                return "module.{$module}::{$view}";
-            }
-
-        }
-
-
-        return null;
-    }
-
-
-
-    // -------------------------------
 
     /**
      * Get theme config.
@@ -429,68 +376,34 @@ class Themes
      * @param  string $key
      * @return mixed
      */
-    public function getConfig($key = null)
+    public function getThemeConfig($key = null)
     {
-        // Main package config.
-        if (!$this->themeConfig) {
-            $this->themeConfig = $this->config->get('veemo.themes');
-        }
-
         // Config inside a public theme.
         // This config having buffer by array object.
-        if ($this->active and !isset($this->themeConfig['themes'][$this->active])) {
-            $this->themeConfig['themes'][$this->active] = array();
+        if ($this->active and $this->type) {
+            $this->themeConfig = [];
 
-            try {
-                // Require public theme config.
-                $minorConfigPath = $this->themeConfig['themeDir'] . '/' . $this->active . '/config.php';
 
-                $this->themeConfig['themes'][$this->active] = $this->files->getRequire($minorConfigPath);
-            } catch (\Illuminate\Contracts\Filesystem\FileNotFoundException $e) {
-                //var_dump($e->getMessage());
-            }
+            // @todo Catch and throw custom exception
+            // try {
+            $theme_path = $this->config->get('veemo.themes.themeDir.' . $this->type) . '/' . $this->active;
+
+            // Require public theme config.
+            $minorConfigPath = $theme_path . '/config.php';
+            $this->themeConfig = $this->files->getRequire($minorConfigPath);
+
+            // Setup theme path
+            $this->themeConfig['path'] = $theme_path;
+
+
+            // } catch (\Illuminate\Contracts\Filesystem\FileNotFoundException $e) {
+            //     var_dump($e->getMessage());
+            // }
         }
-
-        // Evaluate theme config.
-        $this->themeConfig = $this->evaluateConfig($this->themeConfig);
 
         return is_null($key) ? $this->themeConfig : array_get($this->themeConfig, $key);
     }
 
-
-    /**
-     * Evaluate config.
-     *
-     * Config minor is at public folder [theme]/config.php,
-     * thet can be override package config.
-     *
-     * @param  mixed $config
-     * @return mixed
-     */
-    protected function evaluateConfig($config)
-    {
-        if (!isset($config['themes'][$this->active])) {
-            return $config;
-        }
-
-        // Config inside a public theme.
-        $minorConfig = $config['themes'][$this->active];
-
-        // Before event is special case, It's combination.
-        if (isset($minorConfig['events']['before'])) {
-            $minorConfig['events']['appendBefore'] = $minorConfig['events']['before'];
-
-            unset($minorConfig['events']['before']);
-        }
-
-        // Merge two config into one.
-        $config = array_replace_recursive($config, $minorConfig);
-
-        // Reset theme config.
-        $config['themes'][$this->active] = array();
-
-        return $config;
-    }
 
     /**
      * Get current theme name.
@@ -504,13 +417,51 @@ class Themes
 
 
     /**
-     * Get current layout name.
+     * Get theme path.
      *
+     * @param  string $forceThemeName
      * @return string
      */
-    public function getLayoutName()
+    public function path($forceThemeName = null)
     {
-        return $this->layout;
+        $themeDir = $this->config->get('veemo.themes.themeDir.' . $this->type);
+        $theme = $this->active;
+
+        if ($forceThemeName != false) {
+            $theme = $forceThemeName;
+        }
+
+        return $themeDir . '/' . $theme;
+    }
+
+
+    /**
+     * Add location path to look up.
+     *
+     * @param string $location
+     */
+    protected function addPathLocation($location)
+    {
+        // First path is in the selected theme.
+        $hints[] = $location;
+
+
+        // This is nice feature to use inherit from another.
+        if ($this->getThemeConfig('parent')) {
+            // Inherit from theme name.
+            $parent = $this->getThemeConfig('parent') . '/views';
+
+            // Inherit theme path.
+            $parentPath = $this->path($parent);
+
+            if ($this->files->isDirectory($parentPath)) {
+                array_push($hints, $parentPath);
+            }
+        }
+
+
+        // Add namespace with hinting paths.
+        $this->viewFactory->addNamespace($this->getThemeNamespace(), $hints);
     }
 
 
@@ -521,16 +472,9 @@ class Themes
      *
      * @return string
      */
-    public function getThemeNamespace($path = '', $theme = null)
+    public function getThemeNamespace($path = '')
     {
-        if ($theme == null) {
-            // Namespace relate with the theme name.
-            $namespace = static::$namespace . '.' . $this->getThemeName();
-
-        } else {
-            $namespace = static::$namespace . '.' . $theme;
-
-        }
+        $namespace = static::$namespace . '.' . $this->type;
 
         if ($path != false) {
             return $namespace . '::' . $path;
@@ -539,34 +483,309 @@ class Themes
         return $namespace;
     }
 
+
     /**
-     * @param string $path
-     * @param null $theme
+     * Get module view file.
+     *
+     * @param  string $view
      * @return null|string
      */
-    public function getThemeParentNamespace($path = '', $theme = null)
+    protected function getModuleView($view)
     {
-        if ($this->getConfig('parent')) {
-            // Inherit from theme name.
-            $parent = $this->getConfig('parent');
+        if (app('Veemo\Core\Modules\Modules')) {
 
-            // Inherit theme path.
-            $parentPath = $this->path($parent);
+            $viewSegments = explode('.', $view);
+            $moduleViewNamespace = null;
+            $views = [];
 
-            if ($this->files->isDirectory($parentPath)) {
-                $namespace = static::$namespace . '.' . $parent;
+            if ($viewSegments[0] == 'modules') {
+                $module = $viewSegments[1];
+                $view = implode('.', array_slice($viewSegments, 2));
 
-                if ($path != false) {
-                    return $namespace . '::' . $path;
+
+                // --- TYPE SPECIFIC
+
+                // views/{type}/{current_theme}
+                $views['type_plus_current_theme'] = "module.{$module}::{$this->type}.{$this->active}.{$view}";
+
+                // views/{type}/{parent_theme}
+                if ($this->getThemeConfig('parent') !== null) {
+                    $views['type_plus_parent_theme'] = "module.{$module}::{$this->type}.{$this->getThemeConfig('parent')}.{$view}";
                 }
 
-                return $namespace;
+                // views/{type}/{default_theme}
+                $views['type_plus_default_theme'] = "module.{$module}::{$this->type}.{$this->config->get('veemo.themes.themeDefault')}.{$view}";
 
+
+                // --- THEME SPECIFIC
+
+                // views/{current_theme}
+                $views['current_theme'] = "module.{$module}::{$this->active}.{$view}";
+
+                // views/parent_theme}
+                if ($this->getThemeConfig('parent') !== null) {
+                    $views['parent_theme'] = "module.{$module}::{$this->getThemeConfig('parent')}.{$view}";
+                }
+
+                // views/default_theme}
+                $views['default_theme'] = "module.{$module}::{$this->config->get('veemo.themes.themeDefault')}.{$view}";
+
+
+                // --- BASE SPECIFIC
+
+                // views/{current_theme}
+                $views['module_base_view'] = "module.{$module}::{$view}";
+
+
+                foreach ($views as $module_view) {
+
+                    if ($this->viewFactory->exists($module_view)) {
+                        $moduleViewNamespace = $module_view;
+                        break;
+                    }
+                }
+
+                return $moduleViewNamespace ?: null;
             }
+
         }
+
 
         return null;
     }
 
+
+    /**
+     * Set up a partial.
+     *
+     * @param  string $view
+     * @param  array $args
+     * @throws UnknownPartialFileException
+     * @return mixed
+     */
+    public function partial($view, $args = array())
+    {
+        $partial = null;
+        $moduleViewNamespace = null;
+
+
+        $viewSegments = explode('.', $view);
+        $partialViews = [];
+
+        if ($viewSegments[0] == 'modules') {
+
+            $module = $viewSegments[1];
+            $view = implode('.', array_slice($viewSegments, 2));
+
+
+            // Check public/themes
+            $partialViews['theme'] = $this->getThemeNamespace("modules.{$module}.partials.{$view}");
+
+            // Check module
+            $partialViews['module'] = $this->getModuleView("modules.{$module}.partials.{$view}");
+
+            // Check base
+            $partialViews['base'] = $module . '/partials/' . $view ;
+
+
+        } else {
+
+            // Check public/themes
+            $partialViews['theme'] = $this->getThemeNamespace('partials/' . $view);
+
+            // Check base
+            $partialViews['base'] = 'partials/' . $view;
+
+
+        }
+
+
+        //dd($partialViews);
+
+        foreach ($partialViews as $partialView) {
+
+            if ($this->viewFactory->exists($partialView)) {
+                $partial = $partialView;
+                break;
+            }
+        }
+
+        //dd($partialViews);
+
+        if ( $partial == null)
+        {
+            throw new UnknownPartialFileException("Partial view [$view] not found.");
+        }
+
+        return $this->loadPartial($partial, $args);
+    }
+
+    /**
+     * Load a partial
+     *
+     * @param  string $view
+     * @param  array  $args
+     * @throws UnknownPartialFileException
+     * @return mixed
+     */
+    public function loadPartial($view, $args)
+    {
+
+        $partial = $this->viewFactory->make($view, $args)->render();
+
+        $this->regions[$view] = $partial;
+
+        return $this->regions[$view];
+    }
+
+    /**
+     * Assign data across all views.
+     *
+     * @param  mixed $key
+     * @param  mixed $value
+     * @return mixed
+     */
+    public function share($key, $value)
+    {
+        return $this->viewFactory->share($key, $value);
+    }
+
+
+    /**
+     * Check region exists.
+     *
+     * @param  string $region
+     * @return boolean
+     */
+    public function has($region)
+    {
+        return (boolean)isset($this->regions[$region]);
+    }
+
+    /**
+     * Render a region.
+     *
+     * @param  string $region
+     * @param  mixed $default
+     * @return string
+     */
+    public function get($region, $default = null)
+    {
+        if ($this->has($region)) {
+            return $this->regions[$region];
+        }
+
+        return $default ? $default : '';
+    }
+
+    /**
+     * Render a region.
+     *
+     * @param  string $region
+     * @param  mixed $default
+     * @return string
+     */
+    public function place($region, $default = null)
+    {
+        return $this->get($region, $default);
+    }
+
+    /**
+     * Place content in sub-view.
+     *
+     * @return string
+     */
+    public function content()
+    {
+        return $this->regions['content'];
+    }
+
+    /**
+     * Set a place to regions.
+     *
+     * @param  string $region
+     * @param  string $value
+     * @return Theme
+     */
+    public function set($region, $value)
+    {
+        // Content is reserve region for render sub-view.
+        if ($region == 'content') return;
+
+        $this->regions[$region] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Append a place to existing region.
+     *
+     * @param  string $region
+     * @param  string $value
+     * @return Theme
+     */
+    public function append($region, $value)
+    {
+        return $this->appendOrPrepend($region, $value, 'append');
+    }
+
+    /**
+     * Prepend a place to existing region.
+     *
+     * @param  string $region
+     * @param  string $value
+     * @return Theme
+     */
+    public function prepend($region, $value)
+    {
+        return $this->appendOrPrepend($region, $value, 'prepend');
+    }
+
+    /**
+     * Append or prepend existing region.
+     *
+     * @param  string $region
+     * @param  string $value
+     * @param  string $type
+     * @return Theme
+     */
+    protected function appendOrPrepend($region, $value, $type = 'append')
+    {
+        // If region not found, create a new region.
+        if (isset($this->regions[$region])) {
+            if ($type == 'prepend') {
+                $this->regions[$region] = $value . $this->regions[$region];
+            } else {
+                $this->regions[$region] .= $value;
+            }
+        } else {
+            $this->set($region, $value);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * Magic method for set, prepend, append, has, get.
+     *
+     * @param  string $method
+     * @param  array $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters = array())
+    {
+        $callable = preg_split('|[A-Z]|', $method);
+
+        if (in_array($callable[0], array('set', 'prepend', 'append', 'has', 'get'))) {
+            $value = lcfirst(preg_replace('|^' . $callable[0] . '|', '', $method));
+
+            array_unshift($parameters, $value);
+
+            return call_user_func_array(array($this, $callable[0]), $parameters);
+        }
+
+        trigger_error('Call to undefined method ' . __CLASS__ . '::' . $method . '()', E_USER_ERROR);
+    }
 
 }

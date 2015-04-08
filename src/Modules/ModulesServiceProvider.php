@@ -25,7 +25,7 @@ class ModulesServiceProvider extends ServiceProvider
 		]);
 
 
-        \Debugbar::info('Veemo Core/Modules Service Provider loaded');
+        //\Debugbar::info('Veemo Core/Modules Service Provider loaded');
 	}
 
 	/**
