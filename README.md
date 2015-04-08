@@ -7,8 +7,7 @@
 [![Quality Score](https://img.shields.io/scrutinizer/g/ddedic/veemo-core.svg?style=flat-square)](https://scrutinizer-ci.com/g/ddedic/veemo-core)
 [![Total Downloads](https://img.shields.io/packagist/dt/ddedic/veemo-core.svg?style=flat-square)](https://packagist.org/packages/ddedic/veemo-core)
 
-This is where your description should go. Try and limit it to a paragraph or two, and maybe throw in a mention of what
-PSRs you support to avoid any confusion with users and contributors.
+Veemo Application Platform - Core module
 
 ## Install
 
