@@ -112,6 +112,15 @@ class Themes
      */
     protected $viewFactory;
 
+
+    /**
+     * Asset.
+     *
+     * @var \Veemo\Core\Themes\Asset
+     */
+    protected $asset;
+
+
     /**
      * Constructor method.
      *
@@ -119,13 +128,15 @@ class Themes
      * @param Filesystem $files
      * @param Repository $config
      * @param ViewFactory $viewFactory
+     * @param Asset $asset
      */
-    public function __construct(ThemeManager $manager, Filesystem $files, Repository $config, ViewFactory $viewFactory)
+    public function __construct(ThemeManager $manager, Filesystem $files, Repository $config, ViewFactory $viewFactory, Asset $asset)
     {
         $this->manager = $manager;
         $this->config = $config;
         $this->files = $files;
         $this->viewFactory = $viewFactory;
+        $this->asset = $asset;
 
         $this->active = $this->getActive();
         $this->layout = $this->getLayout();
@@ -194,6 +205,10 @@ class Themes
         $this->addPathLocation($this->path() . '/views');
 
 
+        // Add asset path to asset container.
+        $this->asset->addPath($this->path() .'/assets');
+
+
         return $this;
 
     }
@@ -222,14 +237,6 @@ class Themes
         // BASE
         $views['base'] = $view;
 
-        /*
-        echo "<pre>";
-        print_r($views);
-        print_r($this->viewFactory->getFinder());
-        echo "</pre>";
-        echo "<hr />";
-        echo "<br />";
-        */
 
         foreach ($views as $view) {
 
@@ -697,6 +704,18 @@ class Themes
     {
         return $this->regions['content'];
     }
+
+
+    /**
+     * Return asset instance.
+     *
+     * @return \Veemo\Core\Themes\Asset
+     */
+    public function asset()
+    {
+        return $this->asset;
+    }
+
 
     /**
      * Set a place to regions.

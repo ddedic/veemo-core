@@ -10,9 +10,11 @@ return array(
 	| The path to asset, this config can be cdn host.
 	| eg. http://cdn.domain.com
 	|
+	| Default: assets/   (relative to public folder)
+	|
 	*/
 
-	'assetUrl' => '/',
+	'assetUrl' => 'assets/',
 
 	/*
 	|--------------------------------------------------------------------------

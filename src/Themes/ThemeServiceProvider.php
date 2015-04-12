@@ -39,6 +39,9 @@ class ThemeServiceProvider extends ServiceProvider
             __DIR__ . '/../Publish/Config/themes.php', 'veemo.themes'
         );
 
+        // Register Asset
+        $this->registerAsset();
+
         // Register theme manager
         $this->registerThemeManager();
 
@@ -46,16 +49,32 @@ class ThemeServiceProvider extends ServiceProvider
         $this->registerTheme();
 
         // Register commands
-        //$this->registerThemeGenerator();
-        //$this->registerThemeDestroy();
+        /*
+        $this->registerThemeGenerator();
+        $this->registerThemeDestroy();
 
         // Assign commands.
         $this->commands(
             'veemo.theme.create',
-            'veemo.theme.destroy',
-            'veemo.theme.publish'
+            'veemo.theme.destroy'
         );
+        */
     }
+
+
+    /**
+     * Register asset provider.
+     *
+     * @return void
+     */
+    public function registerAsset()
+    {
+        $this->app['veemo.asset'] = $this->app->share(function($app)
+        {
+            return new Asset();
+        });
+    }
+
 
 
     public function registerThemeManager()
@@ -77,7 +96,7 @@ class ThemeServiceProvider extends ServiceProvider
     {
 
         $this->app->bindShared('veemo.themes', function ($app) {
-            return new Themes($app['veemo.theme.manager'],$app['files'], $app['config'], $app['view']);
+            return new Themes($app['veemo.theme.manager'],$app['files'], $app['config'], $app['view'], $app['veemo.asset']);
         });
 
         $this->app->booting(function ($app) {
@@ -85,6 +104,10 @@ class ThemeServiceProvider extends ServiceProvider
         });
 
     }
+
+
+
+
 
 
     /**
@@ -108,7 +131,8 @@ class ThemeServiceProvider extends ServiceProvider
     public function registerThemeDestroy()
     {
         $this->app['veemo.theme.destroy'] = $this->app->share(function ($app) {
-            return new Commands\ThemeDestroyCommand($app['config'], $app['files']);
+            //return new Commands\ThemeDestroyCommand($app['config'], $app['files']);
+            return;
         });
     }
 
@@ -119,7 +143,7 @@ class ThemeServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array('veemo.themes');
+        return array('veemo.themes', 'veemo.assets');
     }
 
 }
