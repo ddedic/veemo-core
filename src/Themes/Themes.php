@@ -205,8 +205,9 @@ class Themes
         $this->addPathLocation($this->path() . '/views');
 
 
+
         // Add asset path to asset container.
-        $this->asset->addPath($this->path() .'/assets');
+        $this->asset->addPath($this->path(null, 'relative') .'/assets');
 
 
         return $this;
@@ -392,7 +393,7 @@ class Themes
 
             // @todo Catch and throw custom exception
             // try {
-            $theme_path = $this->config->get('veemo.themes.themeDir.' . $this->type) . '/' . $this->active;
+            $theme_path = $this->config->get('veemo.themes.themeDir.' . $this->type .'.absolute') . '/' . $this->active;
 
             // Require public theme config.
             $minorConfigPath = $theme_path . '/config.php';
@@ -426,11 +427,12 @@ class Themes
      * Get theme path.
      *
      * @param  string $forceThemeName
+     * @param  string $pathType
      * @return string
      */
-    public function path($forceThemeName = null)
+    public function path($forceThemeName = null, $pathType = 'absolute')
     {
-        $themeDir = $this->config->get('veemo.themes.themeDir.' . $this->type);
+        $themeDir = $this->config->get('veemo.themes.themeDir.' . $this->type . '.' . $pathType);
         $theme = $this->active;
 
         if ($forceThemeName != false) {

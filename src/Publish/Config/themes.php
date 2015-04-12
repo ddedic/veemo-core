@@ -10,11 +10,12 @@ return array(
 	| The path to asset, this config can be cdn host.
 	| eg. http://cdn.domain.com
 	|
-	| Default: assets/   (relative to public folder)
+	| Default: null
 	|
 	*/
 
-	'assetUrl' => 'assets/',
+    //'assetUrl' => 'http://cdn.veemo.dev',
+	'assetUrl' => null,
 
 	/*
 	|--------------------------------------------------------------------------
@@ -53,6 +54,22 @@ return array(
 
 	'layoutDefault' => 'default',
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Allowed Extensions
+    |--------------------------------------------------------------------------
+    |
+    | Allowed extensions used by theme asset class
+    |
+    |
+    */
+    'allowedExtensions' => [
+        'images'    =>   ['jpg', 'jpeg', 'png', 'gif','bmp'],
+        'archives'  =>   []
+    ],
+
+
 	/*
 	|--------------------------------------------------------------------------
 	| Path to lookup theme
@@ -63,8 +80,15 @@ return array(
 	*/
 
 	'themeDir' => [
-        'frontend' => public_path('themes/frontend'),
-        'backend'  => public_path('themes/backend')
+        'frontend' => [
+            'absolute' => public_path('themes/frontend'),
+            'relative' => 'themes/frontend'
+        ],
+
+        'backend'  => [
+            'absolute' => public_path('themes/backend'),
+            'relative' => 'themes/backend'
+        ]
     ],
 
 

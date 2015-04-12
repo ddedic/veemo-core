@@ -6,14 +6,19 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\HTML;
 use Illuminate\Support\Facades\Request;
 
-class AssetContainer {
+/**
+ * Class AssetContainer
+ * @package Veemo\Core\Themes
+ */
+class AssetContainer
+{
 
     /**
      * Use a theme path.
      *
      * @var boolean
      */
-    public $usePath = false;
+    public $usePath = true;
 
     /**
      * Path to theme.
@@ -28,6 +33,14 @@ class AssetContainer {
      * @var string
      */
     public $name;
+
+
+    /**
+     * Module name if we are using $this->module($name) chained method
+     *
+     * @var string
+     */
+    public $module = null;
 
     /**
      * Create a new asset container instance.
@@ -52,13 +65,15 @@ class AssetContainer {
     /**
      * Generate a URL to an application asset.
      *
-     * @param  string  $path
-     * @param  bool    $secure
+     * @param  string $path
+     * @param  bool $secure
      * @return string
      */
     protected function configAssetUrl($path, $secure = null)
     {
-       static $assetUrl;
+        static $assetUrl;
+
+
 
         // Remove this.
         $i = 'index.php';
@@ -66,46 +81,40 @@ class AssetContainer {
         if (URL::isValidUrl($path)) return $path;
 
         // Finding asset url config.
-        if (is_null($assetUrl))
-        {
+        if (is_null($assetUrl)) {
             $assetUrl = \Config::get('veemo.themes.assetUrl', '');
         }
 
         // Using asset url, if available.
-        if ($assetUrl)
-        {
+        if ($assetUrl) {
             $base = rtrim($assetUrl, '/');
 
             // Asset URL without index.
-            $basePath = str_contains($base, $i) ? str_replace('/'.$i, '', $base) : $base;
-        }
-        else
-        {
-            if (is_null($secure))
-            {
-                $scheme = Request::getScheme().'://';
-            }
-            else
-            {
+            $basePath = str_contains($base, $i) ? str_replace('/' . $i, '', $base) : $base;
+        } else {
+            if (is_null($secure)) {
+                $scheme = Request::getScheme() . '://';
+            } else {
                 $scheme = $secure ? 'https://' : 'http://';
             }
 
             // Get root URL.
-            $root  = Request::root();
+            $root = Request::root();
             $start = starts_with($root, 'http://') ? 'http://' : 'https://';
-            $root  = preg_replace('~'.$start.'~', $scheme, $root, 1);
+            $root = preg_replace('~' . $start . '~', $scheme, $root, 1);
 
             // Asset URL without index.
-            $basePath = str_contains($root, $i) ? str_replace('/'.$i, '', $root) : $root;
+            $basePath = str_contains($root, $i) ? str_replace('/' . $i, '', $root) : $root;
         }
 
-        return $basePath.'/'.$path;
+
+        return $basePath . '/' . $path;
     }
 
     /**
      * Root asset path.
      *
-     * @param  string  $uri
+     * @param  string $uri
      * @param  boolean $secure
      * @return string
      */
@@ -117,22 +126,87 @@ class AssetContainer {
     /**
      * Return asset path with current theme path.
      *
-     * @param  string  $uri
+     * @param  string $uri
      * @param  boolean $secure
      * @return string
      */
     public function url($uri, $secure = null)
     {
         // If path is full, so we just return.
-        if (preg_match('#^http|//:#', $uri))
-        {
+        if (preg_match('#^http|//:#', $uri)) {
             return $uri;
         }
 
-        $path = $this->getCurrentPath().$uri;
+        $path = $this->getCurrentPath() . $uri;
 
         return $this->configAssetUrl($path, $secure);
     }
+
+
+    /**
+     * Return image with current theme/module path.
+     *
+     * @param  string $filename
+     * @param  boolean $imgTag
+     * @param  array $attributes
+     * @param  boolean $secure
+     * @return string
+     */
+    public function image($filename, $imgTag = false, $attributes = [],  $secure = null)
+    {
+        $image_extensions_allowed = \Config::get('veemo.themes.allowedExtensions.images', '');
+        $ext = \File::extension($filename);
+
+        if (!in_array($ext, $image_extensions_allowed)){
+            return null;
+        }
+
+        // If path is full, so we just return.
+        if (preg_match('#^http|//:#', $filename)) {
+            return $filename;
+        }
+
+
+        // Prepend path to theme/module.
+        if ($this->isUsePath()) {
+
+
+            if ($this->module === null) {
+
+                $path = $this->getCurrentPath() . $filename;
+
+            }  else {
+
+                $path = $this->evaluatePath($this->getCurrentPath() . 'modules/' . $this->module . '/' . $filename);
+
+                // Reset module name
+                $this->module(null);
+
+            }
+
+
+        } else {
+            $path = $filename;
+            // Reset usePath() set to True (themes)
+            $this->usePath(true);
+        }
+
+
+        $image = $this->configAssetUrl($path, $secure);
+
+
+        if ($imgTag)
+        {
+
+            $image = '<img src="' . $image . '"' . $this->attributes($attributes) . ' />';
+
+        }
+
+
+        return $image;
+
+    }
+
 
     /**
      * Add an asset to the container.
@@ -152,30 +226,25 @@ class AssetContainer {
      *      Asset::add('jquery', 'js/jquery.js', null, array('defer'));
      * </code>
      *
-     * @param  string  $name
-     * @param  string  $source
-     * @param  array   $dependencies
-     * @param  array   $attributes
+     * @param  string $name
+     * @param  string $source
+     * @param  array $dependencies
+     * @param  array $attributes
      * @return AssetContainer
      */
     protected function added($name, $source, $dependencies = array(), $attributes = array())
     {
-        if (is_array($source))
-        {
-            foreach ($source as $path)
-            {
-                $name = $name.'-'.md5($path);
+        if (is_array($source)) {
+            foreach ($source as $path) {
+                $name = $name . '-' . md5($path);
 
                 $this->added($name, $path, $dependencies, $attributes);
             }
-        }
-        else
-        {
+        } else {
             $type = (pathinfo($source, PATHINFO_EXTENSION) == 'css') ? 'style' : 'script';
 
             // Remove unnecessary slashes from internal path.
-            if ( ! preg_match('|^//|', $source))
-            {
+            if (!preg_match('|^//|', $source)) {
                 $source = ltrim($source, '/');
             }
 
@@ -183,13 +252,14 @@ class AssetContainer {
         }
     }
 
+
     /**
      * Alias add an asset to container.
      *
      * @param string $name
      * @param string $source
-     * @param array  $dependencies
-     * @param array  $attributes
+     * @param array $dependencies
+     * @param array $attributes
      */
     public function add($name, $source, $dependencies = array(), $attributes = array())
     {
@@ -202,20 +272,19 @@ class AssetContainer {
      * @param  string $name
      * @param  string string
      * @param  string $source
-     * @param  array  $dependencies
+     * @param  array $dependencies
      * @return AssetContainer
      */
     protected function write($name, $type, $source, $dependencies = array())
     {
         $types = array(
             'script' => 'script',
-            'style'  => 'style',
-            'js'     => 'script',
-            'css'    => 'style'
+            'style' => 'style',
+            'js' => 'script',
+            'css' => 'style'
         );
 
-        if (array_key_exists($type, $types))
-        {
+        if (array_key_exists($type, $types)) {
             $type = $types[$type];
 
             $this->register($type, $name, $source, $dependencies, array());
@@ -230,12 +299,12 @@ class AssetContainer {
      * @param  string $name
      * @param  string string
      * @param  string $source
-     * @param  array  $dependencies
+     * @param  array $dependencies
      * @return AssetContainer
      */
     public function writeScript($name, $source, $dependencies = array())
     {
-        $source = '<script>'.$source.'</script>';
+        $source = '<script>' . $source . '</script>';
 
         return $this->write($name, 'script', $source, $dependencies);
     }
@@ -246,12 +315,12 @@ class AssetContainer {
      * @param  string $name
      * @param  string string
      * @param  string $source
-     * @param  array  $dependencies
+     * @param  array $dependencies
      * @return AssetContainer
      */
     public function writeStyle($name, $source, $dependencies = array())
     {
-        $source = '<style>'.$source.'</style>';
+        $source = '<style>' . $source . '</style>';
 
         return $this->write($name, 'style', $source, $dependencies);
     }
@@ -262,7 +331,7 @@ class AssetContainer {
      * @param  string $name
      * @param  string string
      * @param  string $source
-     * @param  array  $dependencies
+     * @param  array $dependencies
      * @return AssetContainer
      */
     public function writeContent($name, $source, $dependencies = array())
@@ -275,26 +344,29 @@ class AssetContainer {
     /**
      * Add a CSS file to the registered assets.
      *
-     * @param  string           $name
-     * @param  string           $source
-     * @param  array            $dependencies
-     * @param  array            $attributes
+     * @param  string $name
+     * @param  string $source
+     * @param  array $dependencies
+     * @param  array $attributes
      * @return AssetContainer
      */
     public function style($name, $source, $dependencies = array(), $attributes = array())
     {
-        if ( ! array_key_exists('media', $attributes))
-        {
+        if (!array_key_exists('media', $attributes)) {
             $attributes['media'] = 'all';
         }
 
         // Prepend path to theme.
-        if ($this->isUsePath())
-        {
-            $source = $this->evaluatePath($this->getCurrentPath().$source);
+        if ($this->isUsePath()) {
+            if ($this->module !== null) {
+                $source = $this->evaluatePath($this->getCurrentPath() . 'modules/' . $this->module . '/' . $source);
+            } else {
+                $source = $this->evaluatePath($this->getCurrentPath() . $source);
+            }
 
-            // Reset using path.
-            $this->usePath(false);
+
+            // Reset module name
+            $this->module(null);
         }
 
         $this->register('style', $name, $source, $dependencies, $attributes);
@@ -305,21 +377,20 @@ class AssetContainer {
     /**
      * Add a JavaScript file to the registered assets.
      *
-     * @param  string           $name
-     * @param  string           $source
-     * @param  array            $dependencies
-     * @param  array            $attributes
+     * @param  string $name
+     * @param  string $source
+     * @param  array $dependencies
+     * @param  array $attributes
      * @return AssetContainer
      */
     public function script($name, $source, $dependencies = array(), $attributes = array())
     {
         // Prepaend path to theme.
-        if ($this->isUsePath())
-        {
-            $source = $this->evaluatePath($this->getCurrentPath().$source);
+        if ($this->isUsePath()) {
+            $source = $this->evaluatePath($this->getCurrentPath() . $source);
 
-            // Reset using path.
-            $this->usePath(false);
+            // Reset module name
+            $this->module(null);
         }
 
         $this->register('script', $name, $source, $dependencies, $attributes);
@@ -337,22 +408,39 @@ class AssetContainer {
     {
         static $theme;
 
+
         // Make theme to use few features.
-        if ( ! $theme)
-        {
+        if (!$theme) {
             $theme = \App::make('veemo.themes');
         }
 
         // Switch path to another theme.
-        if ( ! is_bool($this->usePath) and $theme->exists($this->usePath))
-        {
+        if (!is_bool($this->usePath) and $theme->exists($this->usePath)) {
             $currentTheme = $theme->getThemeName();
 
             $source = str_replace($currentTheme, $this->usePath, $source);
         }
 
+
         return $source;
     }
+
+
+    /**
+     * @param null $name
+     * @return $this
+     */
+    public function module($name = null)
+    {
+        if (app('Veemo\Core\Modules\Modules')) {
+
+            $this->module = $name;
+
+        }
+
+        return $this;
+    }
+
 
     /**
      * Force use a theme path.
@@ -374,13 +462,13 @@ class AssetContainer {
      */
     public function isUsePath()
     {
-        return (boolean) $this->usePath;
+        return (boolean)$this->usePath;
     }
 
     /**
      * Returns the full-path for an asset.
      *
-     * @param  string  $source
+     * @param  string $source
      * @return string
      */
     public function path($source)
@@ -391,18 +479,18 @@ class AssetContainer {
     /**
      * Add an asset to the array of registered assets.
      *
-     * @param  string  $type
-     * @param  string  $name
-     * @param  string  $source
-     * @param  array   $dependencies
-     * @param  array   $attributes
+     * @param  string $type
+     * @param  string $name
+     * @param  string $source
+     * @param  array $dependencies
+     * @param  array $attributes
      * @return void
      */
     protected function register($type, $name, $source, $dependencies, $attributes)
     {
-        $dependencies = (array) $dependencies;
+        $dependencies = (array)$dependencies;
 
-        $attributes = (array) $attributes;
+        $attributes = (array)$attributes;
 
         $this->assets[$type][$name] = compact('source', 'dependencies', 'attributes');
     }
@@ -430,17 +518,16 @@ class AssetContainer {
     /**
      * Get all of the registered assets for a given type / group.
      *
-     * @param  string  $group
+     * @param  string $group
      * @return string
      */
     protected function group($group)
     {
-        if ( ! isset($this->assets[$group]) or count($this->assets[$group]) == 0) return '';
+        if (!isset($this->assets[$group]) or count($this->assets[$group]) == 0) return '';
 
         $assets = '';
 
-        foreach ($this->arrange($this->assets[$group]) as $name => $data)
-        {
+        foreach ($this->arrange($this->assets[$group]) as $name => $data) {
             $assets .= $this->asset($group, $name);
         }
 
@@ -450,27 +537,25 @@ class AssetContainer {
     /**
      * Get the HTML link to a registered asset.
      *
-     * @param  string  $group
-     * @param  string  $name
+     * @param  string $group
+     * @param  string $name
      * @return string
      */
     protected function asset($group, $name)
     {
-        if ( ! isset($this->assets[$group][$name])) return '';
+        if (!isset($this->assets[$group][$name])) return '';
 
         $asset = $this->assets[$group][$name];
 
         // If the bundle source is not a complete URL, we will go ahead and prepend
         // the bundle's asset path to the source provided with the asset. This will
         // ensure that we attach the correct path to the asset.
-        if (filter_var($asset['source'], FILTER_VALIDATE_URL) === false)
-        {
+        if (filter_var($asset['source'], FILTER_VALIDATE_URL) === false) {
             $asset['source'] = $this->path($asset['source']);
         }
 
         // If source is not a path to asset, render without wrap a HTML.
-        if (strpos($asset['source'], '<') !== false)
-        {
+        if (strpos($asset['source'], '<') !== false) {
             return $asset['source'];
         }
 
@@ -484,12 +569,11 @@ class AssetContainer {
 
     public function html($group, $source, $attributes)
     {
-        switch ($group)
-        {
+        switch ($group) {
             case 'script' :
                 $attributes['src'] = $source;
 
-                return '<script'.$this->attributes($attributes).'></script>'.PHP_EOL;
+                return '<script' . $this->attributes($attributes) . '></script>' . PHP_EOL;
             case 'style' :
 
                 $defaults = array('media' => 'all', 'type' => 'text/css', 'rel' => 'stylesheet');
@@ -498,14 +582,14 @@ class AssetContainer {
 
                 $attributes['href'] = $source;
 
-                return '<link'.$this->attributes($attributes).'>'.PHP_EOL;
+                return '<link' . $this->attributes($attributes) . '>' . PHP_EOL;
         }
     }
 
     /**
      * Build an HTML attribute string from an array.
      *
-     * @param  array  $attributes
+     * @param  array $attributes
      * @return string
      */
     public function attributes($attributes)
@@ -515,44 +599,41 @@ class AssetContainer {
         // For numeric keys we will assume that the key and the value are the same
         // as this will convert HTML attributes such as "required" to a correct
         // form like required="required" instead of using incorrect numerics.
-        foreach ((array) $attributes as $key => $value)
-        {
+        foreach ((array)$attributes as $key => $value) {
             $element = $this->attributeElement($key, $value);
 
-            if ( ! is_null($element)) $html[] = $element;
+            if (!is_null($element)) $html[] = $element;
         }
 
-        return count($html) > 0 ? ' '.implode(' ', $html) : '';
+        return count($html) > 0 ? ' ' . implode(' ', $html) : '';
     }
 
     /**
      * Build a single attribute element.
      *
-     * @param  string  $key
-     * @param  string  $value
+     * @param  string $key
+     * @param  string $value
      * @return string
      */
     protected function attributeElement($key, $value)
     {
         if (is_numeric($key)) $key = $value;
 
-        if ( ! is_null($value)) return $key.'="'.e($value).'"';
+        if (!is_null($value)) return $key . '="' . e($value) . '"';
     }
 
     /**
      * Sort and retrieve assets based on their dependencies
      *
-     * @param   array  $assets
+     * @param   array $assets
      * @return  array
      */
     protected function arrange($assets)
     {
         list($original, $sorted) = array($assets, array());
 
-        while (count($assets) > 0)
-        {
-            foreach ($assets as $asset => $value)
-            {
+        while (count($assets) > 0) {
+            foreach ($assets as $asset => $value) {
                 $this->evaluateAsset($asset, $value, $original, $sorted, $assets);
             }
         }
@@ -563,11 +644,11 @@ class AssetContainer {
     /**
      * Evaluate an asset and its dependencies.
      *
-     * @param  string  $asset
-     * @param  string  $value
-     * @param  array   $original
-     * @param  array   $sorted
-     * @param  array   $assets
+     * @param  string $asset
+     * @param  string $value
+     * @param  array $original
+     * @param  array $sorted
+     * @param  array $assets
      * @return void
      */
     protected function evaluateAsset($asset, $value, $original, &$sorted, &$assets)
@@ -575,18 +656,13 @@ class AssetContainer {
         // If the asset has no more dependencies, we can add it to the sorted list
         // and remove it from the array of assets. Otherwise, we will not verify
         // the asset's dependencies and determine if they've been sorted.
-        if (count($assets[$asset]['dependencies']) == 0)
-        {
+        if (count($assets[$asset]['dependencies']) == 0) {
             $sorted[$asset] = $value;
 
             unset($assets[$asset]);
-        }
-        else
-        {
-            foreach ($assets[$asset]['dependencies'] as $key => $dependency)
-            {
-                if ( ! $this->dependecyIsValid($asset, $dependency, $original, $assets))
-                {
+        } else {
+            foreach ($assets[$asset]['dependencies'] as $key => $dependency) {
+                if (!$this->dependecyIsValid($asset, $dependency, $original, $assets)) {
                     unset($assets[$asset]['dependencies'][$key]);
 
                     continue;
@@ -595,7 +671,7 @@ class AssetContainer {
                 // If the dependency has not yet been added to the sorted list, we can not
                 // remove it from this asset's array of dependencies. We'll try again on
                 // the next trip through the loop.
-                if ( ! isset($sorted[$dependency])) continue;
+                if (!isset($sorted[$dependency])) continue;
 
                 unset($assets[$asset]['dependencies'][$key]);
             }
@@ -618,16 +694,11 @@ class AssetContainer {
      */
     protected function dependecyIsValid($asset, $dependency, $original, $assets)
     {
-        if ( ! isset($original[$dependency]))
-        {
+        if (!isset($original[$dependency])) {
             return false;
-        }
-        elseif ($dependency === $asset)
-        {
+        } elseif ($dependency === $asset) {
             throw new \Exception("Asset [$asset] is dependent on itself.");
-        }
-        elseif (isset($assets[$dependency]) and in_array($asset, $assets[$dependency]['dependencies']))
-        {
+        } elseif (isset($assets[$dependency]) and in_array($asset, $assets[$dependency]['dependencies'])) {
             throw new \Exception("Assets [$asset] and [$dependency] have a circular dependency.");
         }
 

@@ -29,6 +29,7 @@ class CoreServiceProvider extends ServiceProvider
 
         $this->registerConsoleCommands();
 
+        $this->registerHelpers();
 
     }
 
@@ -50,6 +51,15 @@ class CoreServiceProvider extends ServiceProvider
     {
         $this->app->register('Veemo\Core\Themes\ThemeServiceProvider');
         AliasLoader::getInstance()->alias('Theme', 'Veemo\Core\Themes\Facades\Theme');
+    }
+
+
+
+    protected function registerHelpers()
+    {
+        foreach (glob(__DIR__ . '/Helpers/*Helper.php') as $filename){
+            require_once($filename);
+        }
     }
 
 
