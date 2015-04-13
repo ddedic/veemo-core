@@ -320,8 +320,6 @@ class Themes
      */
     public function render($statusCode = 200)
     {
-
-
         // Flush asset that need to serve.
         $this->asset->flush();
 
@@ -337,7 +335,7 @@ class Themes
         $content = new Response($content, $statusCode);
 
         // Fire the event after render.
-        $this->fire('after', $this);
+        $this->fire('afterRenderTheme', $this);
 
         return $content;
     }
