@@ -84,3 +84,42 @@ function module_image($module = null, $filename = null, $imgTag = false, $attrib
 
     return null;
 }
+
+
+/**
+ * @param string $container
+ * @return mixed
+ */
+function theme_styles($container = null)
+{
+    $theme = app('veemo.themes');
+
+    if ($container !== null) {
+
+        return $theme->asset()->container($container)->styles();
+
+    }
+
+    return $theme->asset()->styles();
+
+}
+
+
+
+/**
+ * @param string $container
+ * @return mixed
+ */
+function theme_scripts($container = null)
+{
+    $theme = app('veemo.themes');
+
+    if ($container !== null) {
+
+        return $theme->asset()->container($container)->scripts();
+
+    }
+
+    return $theme->asset()->scripts();
+
+}

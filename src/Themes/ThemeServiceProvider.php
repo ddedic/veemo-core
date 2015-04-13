@@ -96,7 +96,7 @@ class ThemeServiceProvider extends ServiceProvider
     {
 
         $this->app->bindShared('veemo.themes', function ($app) {
-            return new Themes($app['veemo.theme.manager'],$app['files'], $app['config'], $app['view'], $app['veemo.asset']);
+            return new Themes($app['veemo.theme.manager'],$app['files'], $app['config'], $app['events'], $app['view'], $app['veemo.asset']);
         });
 
         $this->app->booting(function ($app) {

@@ -9,7 +9,10 @@
 
 namespace Veemo\Core\Themes;
 
+use Closure;
+
 use Illuminate\Config\Repository;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Response;
@@ -98,6 +101,13 @@ class Themes
     protected $config;
 
     /**
+     * Event dispatcher.
+     *
+     * @var \Illuminate\Events\Dispatcher
+     */
+    protected $events;
+
+    /**
      * @var Filesystem
      */
     protected $files;
@@ -127,13 +137,15 @@ class Themes
      * @param ThemeManager $manager
      * @param Filesystem $files
      * @param Repository $config
+     * @param  \Illuminate\Events\Dispatcher $events
      * @param ViewFactory $viewFactory
      * @param Asset $asset
      */
-    public function __construct(ThemeManager $manager, Filesystem $files, Repository $config, ViewFactory $viewFactory, Asset $asset)
+    public function __construct(ThemeManager $manager, Filesystem $files, Repository $config, Dispatcher $events, ViewFactory $viewFactory, Asset $asset)
     {
         $this->manager = $manager;
         $this->config = $config;
+        $this->events = $events;
         $this->files = $files;
         $this->viewFactory = $viewFactory;
         $this->asset = $asset;
@@ -177,6 +189,23 @@ class Themes
 
 
     /**
+     * Fire event to config listener.
+     *
+     * @param  string $event
+     * @param  mixed  $args
+     * @return void
+     */
+    public function fire($event, $args)
+    {
+        $onEvent = $this->getThemeConfig('events.'.$event);
+
+        if ($onEvent instanceof Closure)
+        {
+            $onEvent($args);
+        }
+    }
+
+    /**
      * @param $theme
      * @return $this
      */
@@ -205,6 +234,9 @@ class Themes
         $this->addPathLocation($this->path() . '/views');
 
 
+        // Fire event 'setup' -> Before Theme Setup
+        $this->fire('setup', $this);
+
 
         // Add asset path to asset container.
         $this->asset->addPath($this->path(null, 'relative') .'/assets');
@@ -220,13 +252,10 @@ class Themes
      *
      * @param string $view
      * @param array $data
-     * @param int $statusCode
      * @return View
      */
-    public function view($view, $data = array(), $statusCode = 200)
+    public function view($view, $data = array())
     {
-        //dd($this->viewFactory->getFinder());
-
         $viewNamespace = null;
 
         // MAIN THEME / PARENT THEME
@@ -253,7 +282,22 @@ class Themes
         }
 
 
+        // Fire event global assets.
+        $this->fire('asset', $this->asset);
+
+        // Fire event before render theme.
+        $this->fire('beforeRenderTheme', $this);
+
+        // Fire event before render layout.
+        $this->fire('beforeRenderLayout.'.$this->layout, $this);
+
+        // Fire event before render content.
+        $this->fire('beforeRenderContent', $this);
+
         $content = $this->viewFactory->make($viewNamespace, $data)->render();
+
+        // Fire event after render content.
+        $this->fire('afterRenderContent', $this);
 
         // View path of content.
         $this->content = $view;
@@ -276,6 +320,11 @@ class Themes
      */
     public function render($statusCode = 200)
     {
+
+
+        // Flush asset that need to serve.
+        $this->asset->flush();
+
         $path = $this->getThemeNamespace('layouts.' . $this->layout);
 
         if (!$this->viewFactory->exists($path)) {
@@ -286,6 +335,9 @@ class Themes
 
         // Append status code to view.
         $content = new Response($content, $statusCode);
+
+        // Fire the event after render.
+        $this->fire('after', $this);
 
         return $content;
     }
@@ -384,6 +436,49 @@ class Themes
      * @return mixed
      */
     public function getThemeConfig($key = null)
+    {
+        // Config inside a public theme.
+        // This config having buffer by array object.
+        if ($this->active and $this->type) {
+            $this->themeConfig = [];
+
+
+            // @todo Catch and throw custom exception
+            // try {
+            $theme_path = $this->config->get('veemo.themes.themeDir.' . $this->type .'.absolute') . '/' . $this->active;
+
+            // Require public theme config.
+            $themeConfigFile = $theme_path . '/config.php';
+            $themeEventsFile = $theme_path . '/events.php';
+
+            $this->themeConfig = $this->files->getRequire($themeConfigFile);
+
+            // Setup theme path
+            $this->themeConfig['path'] = $theme_path;
+            $this->themeConfig['events'] = [];
+
+            if ($this->files->isFile($themeEventsFile))
+            {
+                $this->themeConfig['events'] = $this->files->getRequire($themeEventsFile);
+            }
+
+
+            // } catch (\Illuminate\Contracts\Filesystem\FileNotFoundException $e) {
+            //     var_dump($e->getMessage());
+            // }
+        }
+
+        return is_null($key) ? $this->themeConfig : array_get($this->themeConfig, $key);
+    }
+
+
+    /**
+     * Get theme config.
+     *
+     * @param  string $key
+     * @return mixed
+     */
+    public function getThemeEvents($key = null)
     {
         // Config inside a public theme.
         // This config having buffer by array object.
@@ -608,8 +703,6 @@ class Themes
         }
 
 
-        //dd($partialViews);
-
         foreach ($partialViews as $partialView) {
 
             if ($this->viewFactory->exists($partialView)) {
@@ -643,6 +736,61 @@ class Themes
         $this->regions[$view] = $partial;
 
         return $this->regions[$view];
+    }
+
+
+
+    /**
+     * Binding data to view.
+     *
+     * @param  string $variable
+     * @param  mixed  $callback
+     * @return mixed
+     */
+    public function bind($variable, $callback = null)
+    {
+        $name = 'theme.bind.'.$variable;
+
+        // If callback pass, so put in a queue.
+        if ( ! empty($callback))
+        {
+            // Preparing callback in to queues.
+            $this->events->listen($name, function() use ($callback, $variable)
+            {
+                return ($callback instanceof Closure) ? $callback() : $callback;
+            });
+        }
+
+
+
+        // Passing variable to closure.
+        $_events   =& $this->events;
+        $_bindings =& $this->bindings;
+
+
+
+        // Buffer processes to save request.
+        return array_get($this->bindings, $name, function() use (&$_events, &$_bindings, $name)
+        {
+            $response = current($_events->fire($name));
+
+            array_set($_bindings, $name, $response);
+
+            return $response;
+        });
+    }
+
+    /**
+     * Check having binded data.
+     *
+     * @param  string $variable
+     * @return boolean
+     */
+    public function binded($variable)
+    {
+        $name = 'theme.bind.'.$variable;
+
+        return $this->events->hasListeners($name);
     }
 
     /**
