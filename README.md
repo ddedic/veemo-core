@@ -1,45 +1,18 @@
-# Veemo Core
+# Awesome, you've just made a new workspace!
+Workspaces are fantastic for organizing your work. This new workspace, which lives inside the 'Workspaces' folder of your home
+directory, is a place where you can store all relevant and related files to a particular project. For example, if you
+are working on multiple projects, its nice to have them separated as follows:
+-|home dir
+   -|Workspaces
+    -| Project 1
+    -| Project 2
+    -| Project 3
 
-[![Latest Version](https://img.shields.io/github/release/thephpleague/:package_name.svg?style=flat-square)](https://github.com/ddedic/veemo-core/releases)
-[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
-[![Build Status](https://img.shields.io/travis/ddedic/veemo-core/master.svg?style=flat-square)](https://travis-ci.org/ddedic/veemo-core)
-[![Coverage Status](https://img.shields.io/scrutinizer/coverage/g/ddedic/veemo-core.svg?style=flat-square)](https://scrutinizer-ci.com/g/ddedic/veemo-core/code-structure)
-[![Quality Score](https://img.shields.io/scrutinizer/g/ddedic/veemo-core.svg?style=flat-square)](https://scrutinizer-ci.com/g/ddedic/veemo-core)
-[![Total Downloads](https://img.shields.io/packagist/dt/ddedic/veemo-core.svg?style=flat-square)](https://packagist.org/packages/ddedic/veemo-core)
+Workspaces help keep your projects organized. You can create any number of workspaces. There are no limits.
 
-Veemo Application Platform - Core module
+Note: A workspace folder is just a regular folder so you can create any number of files and folders inside it.
 
-## Install
+As you move back and forth between your workspaces, Koding will remember everything about each workspace. This includes things
+like IDE settings, files open, Terminals open, etc.
 
-Via Composer
-
-``` bash
-$ composer require ddedic/veemo-core
-```
-
-## Usage
-
-
-
-## Testing
-
-``` bash
-$ phpunit
-```
-
-## Contributing
-
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
-
-## Security
-
-If you discover any security related issues, please email dedic.d@gmail.com instead of using the issue tracker.
-
-## Credits
-
-- [Danijel Dedic](https://github.com/ddedic)
-- [All Contributors](../../contributors)
-
-## License
-
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+Enjoy and Happy Koding!

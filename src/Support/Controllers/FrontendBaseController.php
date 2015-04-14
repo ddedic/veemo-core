@@ -19,13 +19,13 @@ class FrontendBaseController extends BaseController {
     public function test()
     {
 
+        // kodio push/pull test
 
         return $this->theme
             //->layout('default')
             ->setVar('Testić')
             ->prependTitle('Frontend test - ')
             ->view('testView')
-            //->view('modules.dummy.demo')
             ->render();
     }
 
