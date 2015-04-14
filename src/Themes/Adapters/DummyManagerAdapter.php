@@ -52,7 +52,7 @@ class DummyManagerAdapter implements ThemeManagerAdapterInterface
 
 
             'AdminLTE' => [
-                'slug' => 'adminlte',
+                'slug' => 'default',
                 'type' => 'backend',
                 'enabled' => true
             ]
@@ -95,7 +95,7 @@ class DummyManagerAdapter implements ThemeManagerAdapterInterface
         $themes = [
 
             'AdminLTE' => [
-                'slug' => 'adminlte',
+                'slug' => 'default',
                 'type' => 'backend',
                 'enabled' => true
             ]
