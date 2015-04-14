@@ -25,10 +25,10 @@ use Veemo\Core\Themes\Exceptions\UnknownPartialFileException;
 
 
 /**
- * Class Themes
- * @package Veemo\Core\Themes
+ * Class Theme
+ * @package Veemo\Core\Theme
  */
-class Themes
+class Theme
 {
     /**
      * @var string
@@ -736,7 +736,67 @@ class Themes
         return $this->regions[$view];
     }
 
+    /**
+     * Hook a partial before rendering.
+     *
+     * @param  mixed   $view
+     * @param  closure $callback
+     * @return void
+     */
+    public function partialComposer($view, $callback)
+    {
+        $partial = null;
+        $moduleViewNamespace = null;
 
+
+        $viewSegments = explode('.', $view);
+        $partialViews = [];
+
+        if ($viewSegments[0] == 'modules') {
+
+            $module = $viewSegments[1];
+            $view = implode('.', array_slice($viewSegments, 2));
+
+
+            // Check public/themes
+            $partialViews['theme'] = $this->getThemeNamespace("modules.{$module}.partials.{$view}");
+
+            // Check module
+            $partialViews['module'] = $this->getModuleView("modules.{$module}.partials.{$view}");
+
+            // Check base
+            $partialViews['base'] = $module . '/partials/' . $view;
+
+
+        } else {
+
+            // Check public/themes
+            $partialViews['theme'] = $this->getThemeNamespace('partials/' . $view);
+
+            // Check base
+            $partialViews['base'] = 'partials/' . $view;
+
+
+        }
+
+
+        foreach ($partialViews as $partialView) {
+
+            if ($this->viewFactory->exists($partialView)) {
+                $partial = $partialView;
+                break;
+            }
+        }
+
+        //dd($partialViews);
+
+        if ($partial == null) {
+            throw new UnknownPartialFileException("Partial view [$view] not found.");
+        }
+
+
+        $this->viewFactory->composer($partial, $callback);
+    }
 
     /**
      * Binding data to view.

@@ -9,6 +9,6 @@ class Theme extends Facade {
      *
      * @return string
      */
-    protected static function getFacadeAccessor() { return 'veemo.themes'; }
+    protected static function getFacadeAccessor() { return 'veemo.theme'; }
 
 }

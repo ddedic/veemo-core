@@ -19,7 +19,7 @@
  */
 function theme($themeType = 'frontend', $themeName = null, $layoutName = null)
 {
-    $theme = app('veemo.themes');
+    $theme = app('veemo.theme');
 
     if ($themeName)
     {
@@ -47,7 +47,7 @@ function theme_image($filename = null, $imgTag = false, $attributes = [],  $secu
 
     if ($filename && $filename !== null)
     {
-        $theme = app('veemo.themes');
+        $theme = app('veemo.theme');
 
         return $theme->asset()->image($filename, $imgTag, $attributes,  $secure);
     }
@@ -73,7 +73,7 @@ function module_image($module = null, $filename = null, $imgTag = false, $attrib
 
     if ($module && $module !== null && $filename && $filename !== null)
     {
-        $theme = app('veemo.themes');
+        $theme = app('veemo.theme');
 
         return $theme->asset()->module($module)->image($filename, $imgTag, $attributes,  $secure);
     }
@@ -92,7 +92,7 @@ function module_image($module = null, $filename = null, $imgTag = false, $attrib
  */
 function theme_styles($container = null)
 {
-    $theme = app('veemo.themes');
+    $theme = app('veemo.theme');
 
     if ($container !== null) {
 
@@ -112,7 +112,7 @@ function theme_styles($container = null)
  */
 function theme_scripts($container = null)
 {
-    $theme = app('veemo.themes');
+    $theme = app('veemo.theme');
 
     if ($container !== null) {
 
@@ -122,4 +122,26 @@ function theme_scripts($container = null)
 
     return $theme->asset()->scripts();
 
+}
+
+
+/**
+ * @param null $view
+ * @param array $args
+ * @return mixed
+ */
+function theme_partial($view = null, $args = [])
+{
+    $theme = app('veemo.theme');
+
+    if($view !== null) {
+
+        return $theme->partial($view, $args);
+
+    }
+
+    // @todo ENV detect
+    app('log')->error('Method {module_partial} error. Filename/View parameter is not set.');
+
+    return null;
 }

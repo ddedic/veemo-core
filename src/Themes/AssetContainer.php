@@ -411,7 +411,7 @@ class AssetContainer
 
         // Make theme to use few features.
         if (!$theme) {
-            $theme = \App::make('veemo.themes');
+            $theme = \App::make('veemo.theme');
         }
 
         // Switch path to another theme.

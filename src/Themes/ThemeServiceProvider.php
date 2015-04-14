@@ -24,7 +24,6 @@ class ThemeServiceProvider extends ServiceProvider
             __DIR__ . '/../Publish/Config/themes.php' => config_path('themes.php'),
         ]);
 
-        // \Debugbar::info('Themes loaded');
 
     }
 
@@ -95,8 +94,8 @@ class ThemeServiceProvider extends ServiceProvider
     public function registerTheme()
     {
 
-        $this->app->bindShared('veemo.themes', function ($app) {
-            return new Themes($app['veemo.theme.manager'],$app['files'], $app['config'], $app['events'], $app['view'], $app['veemo.asset']);
+        $this->app->bindShared('veemo.theme', function ($app) {
+            return new Theme($app['veemo.theme.manager'],$app['files'], $app['config'], $app['events'], $app['view'], $app['veemo.asset']);
         });
 
         $this->app->booting(function ($app) {
@@ -143,7 +142,7 @@ class ThemeServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array('veemo.themes', 'veemo.assets');
+        return array('veemo.theme', 'veemo.assets');
     }
 
 }

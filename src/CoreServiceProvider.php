@@ -14,6 +14,20 @@ class CoreServiceProvider extends ServiceProvider
     protected $defer = false;
 
 
+
+    public function boot()
+    {
+
+        // Publish config.
+        $this->publishes([
+            __DIR__ . '/Publish/Config/core.php' => config_path('core.php'),
+        ]);
+
+
+    }
+
+
+
     /**
      * Register the Core module service provider.
      *
@@ -21,6 +35,10 @@ class CoreServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->mergeConfigFrom(
+            __DIR__ . '/Publish/Config/core.php', 'veemo.core'
+        );
+
         $this->registerNamespaces();
 
         $this->registerModules();
@@ -34,10 +52,7 @@ class CoreServiceProvider extends ServiceProvider
     }
 
 
-    public function boot()
-    {
-        //\Debugbar::info('Veemo Core Service Provider loaded');
-    }
+
 
 
     protected function registerModules()
