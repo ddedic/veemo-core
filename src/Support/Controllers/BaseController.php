@@ -9,6 +9,12 @@ abstract class BaseController extends Controller {
 
     use DispatchesCommands, ValidatesRequests;
 
+
+    /**
+     * @theme \Veemo\Core\Themes\Theme
+     */
+    protected $theme = 'test';
+
 }
 
 
