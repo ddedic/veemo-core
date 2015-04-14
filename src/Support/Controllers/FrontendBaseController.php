@@ -1,7 +1,6 @@
 <?php namespace Veemo\Core\Support\Controllers;
 
 
-use Config;
 
 class FrontendBaseController extends BaseController {
 

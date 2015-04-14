@@ -13,7 +13,7 @@ abstract class BaseController extends Controller {
     /**
      * @theme \Veemo\Core\Themes\Theme
      */
-    protected $theme = 'test';
+    protected $theme;
 
 }
 
