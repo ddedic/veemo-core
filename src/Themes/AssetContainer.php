@@ -234,6 +234,18 @@ class AssetContainer
      */
     protected function added($name, $source, $dependencies = array(), $attributes = array())
     {
+
+        // If path is full, so we just return.
+        if (preg_match('#^http|//:#', $source)) {
+
+            $type = (pathinfo($source, PATHINFO_EXTENSION) == 'css') ? 'style' : 'script';
+
+            $this->register($type, $name, $source, $dependencies, $attributes);
+
+            return $this;
+        }
+
+
         if (is_array($source)) {
             foreach ($source as $path) {
                 $name = $name . '-' . md5($path);

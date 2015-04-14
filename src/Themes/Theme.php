@@ -288,8 +288,6 @@ class Theme
         // Fire event before render theme.
         $this->fire('beforeRenderTheme', $this);
 
-        // Fire event before render layout.
-        $this->fire('beforeRenderLayout.'.$this->layout, $this);
 
         // Fire event before render content.
         $this->fire('beforeRenderContent', $this);
@@ -328,6 +326,9 @@ class Theme
         if (!$this->viewFactory->exists($path)) {
             throw new UnknownLayoutFileException("Layout [$this->layout] not found.");
         }
+
+        // Fire event before render layout.
+        $this->fire('beforeRenderLayout.'.$this->layout, $this);
 
         $content = $this->viewFactory->make($path)->render();
 

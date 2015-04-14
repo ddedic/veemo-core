@@ -94,7 +94,7 @@ class DummyManagerAdapter implements ThemeManagerAdapterInterface
     {
         $themes = [
 
-            'AdminLTE' => [
+            'default' => [
                 'slug' => 'default',
                 'type' => 'backend',
                 'enabled' => true

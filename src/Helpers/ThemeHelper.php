@@ -8,26 +8,23 @@
  */
 
 
-
 /**
  * Get the theme instance.
  *
- * @param  string  $themeType
- * @param  string  $themeName
- * @param  string  $layoutName
+ * @param  string $themeType
+ * @param  string $themeName
+ * @param  string $layoutName
  * @return \Veemo\Core\Themes\Theme
  */
 function theme($themeType = 'frontend', $themeName = null, $layoutName = null)
 {
     $theme = app('veemo.theme');
 
-    if ($themeName)
-    {
+    if ($themeName) {
         $theme->$themeType()->uses($themeName);
     }
 
-    if ($layoutName)
-    {
+    if ($layoutName) {
         $theme->layout($layoutName);
     }
 
@@ -42,14 +39,13 @@ function theme($themeType = 'frontend', $themeName = null, $layoutName = null)
  * @param bool $secure
  * @return string
  */
-function theme_image($filename = null, $imgTag = false, $attributes = [],  $secure = false)
+function theme_image($filename = null, $imgTag = false, $attributes = [], $secure = false)
 {
 
-    if ($filename && $filename !== null)
-    {
+    if ($filename && $filename !== null) {
         $theme = app('veemo.theme');
 
-        return $theme->asset()->image($filename, $imgTag, $attributes,  $secure);
+        return $theme->asset()->image($filename, $imgTag, $attributes, $secure);
     }
 
     // @todo ENV detect
@@ -57,7 +53,6 @@ function theme_image($filename = null, $imgTag = false, $attributes = [],  $secu
 
     return null;
 }
-
 
 
 /**
@@ -68,14 +63,13 @@ function theme_image($filename = null, $imgTag = false, $attributes = [],  $secu
  * @param bool $secure
  * @return string
  */
-function module_image($module = null, $filename = null, $imgTag = false, $attributes = [],  $secure = false)
+function module_image($module = null, $filename = null, $imgTag = false, $attributes = [], $secure = false)
 {
 
-    if ($module && $module !== null && $filename && $filename !== null)
-    {
+    if ($module && $module !== null && $filename && $filename !== null) {
         $theme = app('veemo.theme');
 
-        return $theme->asset()->module($module)->image($filename, $imgTag, $attributes,  $secure);
+        return $theme->asset()->module($module)->image($filename, $imgTag, $attributes, $secure);
     }
 
     // @todo ENV detect
@@ -103,7 +97,6 @@ function theme_styles($container = null)
     return $theme->asset()->styles();
 
 }
-
 
 
 /**
@@ -134,7 +127,7 @@ function theme_partial($view = null, $args = [])
 {
     $theme = app('veemo.theme');
 
-    if($view !== null) {
+    if ($view !== null) {
 
         return $theme->partial($view, $args);
 
@@ -144,4 +137,15 @@ function theme_partial($view = null, $args = [])
     app('log')->error('Method {module_partial} error. Filename/View parameter is not set.');
 
     return null;
+}
+
+
+/**
+ * @return mixed
+ */
+function theme_content()
+{
+    $theme = app('veemo.theme');
+
+    return $theme->content();
 }
