@@ -21,7 +21,7 @@ class ThemeServiceProvider extends ServiceProvider
     {
         // Publish config.
         $this->publishes([
-            __DIR__ . '/../Publish/Config/themes.php' => config_path('themes.php'),
+            __DIR__ . '/../Publish/Config/themes.php' => config_path('veemo/themes.php'),
         ]);
 
 

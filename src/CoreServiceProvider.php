@@ -20,7 +20,7 @@ class CoreServiceProvider extends ServiceProvider
 
         // Publish config.
         $this->publishes([
-            __DIR__ . '/Publish/Config/core.php' => config_path('core.php'),
+            __DIR__ . '/Publish/Config/core.php' => config_path('veemo/core.php'),
         ]);
 
 

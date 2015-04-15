@@ -53,13 +53,15 @@ class AssetContainer
     }
 
     /**
-     * Get path from asset.
+     * Root asset path.
      *
+     * @param  string $uri
+     * @param  boolean $secure
      * @return string
      */
-    public function getCurrentPath()
+    public function originUrl($uri, $secure = null)
     {
-        return Asset::$path;
+        return $this->configAssetUrl($uri, $secure);
     }
 
     /**
@@ -72,7 +74,6 @@ class AssetContainer
     protected function configAssetUrl($path, $secure = null)
     {
         static $assetUrl;
-
 
 
         // Remove this.
@@ -112,18 +113,6 @@ class AssetContainer
     }
 
     /**
-     * Root asset path.
-     *
-     * @param  string $uri
-     * @param  boolean $secure
-     * @return string
-     */
-    public function originUrl($uri, $secure = null)
-    {
-        return $this->configAssetUrl($uri, $secure);
-    }
-
-    /**
      * Return asset path with current theme path.
      *
      * @param  string $uri
@@ -142,6 +131,15 @@ class AssetContainer
         return $this->configAssetUrl($path, $secure);
     }
 
+    /**
+     * Get path from asset.
+     *
+     * @return string
+     */
+    public function getCurrentPath()
+    {
+        return Asset::$path;
+    }
 
     /**
      * Return image with current theme/module path.
@@ -152,12 +150,12 @@ class AssetContainer
      * @param  boolean $secure
      * @return string
      */
-    public function image($filename, $imgTag = false, $attributes = [],  $secure = null)
+    public function image($filename, $imgTag = false, $attributes = [], $secure = null)
     {
         $image_extensions_allowed = \Config::get('veemo.themes.allowedExtensions.images', '');
         $ext = \File::extension($filename);
 
-        if (!in_array($ext, $image_extensions_allowed)){
+        if (!in_array($ext, $image_extensions_allowed)) {
             return null;
         }
 
@@ -175,7 +173,7 @@ class AssetContainer
 
                 $path = $this->getCurrentPath() . $filename;
 
-            }  else {
+            } else {
 
                 $path = $this->evaluatePath($this->getCurrentPath() . 'modules/' . $this->module . '/' . $filename);
 
@@ -195,8 +193,7 @@ class AssetContainer
         $image = $this->configAssetUrl($path, $secure);
 
 
-        if ($imgTag)
-        {
+        if ($imgTag) {
 
             $image = '<img src="' . $image . '"' . $this->attributes($attributes) . ' />';
 
@@ -207,6 +204,119 @@ class AssetContainer
 
     }
 
+    /**
+     * Check using theme path.
+     *
+     * @return boolean
+     */
+    public function isUsePath()
+    {
+        return (boolean)$this->usePath;
+    }
+
+    /**
+     * Evaluate path to current theme or force use theme.
+     *
+     * @param  string $source
+     * @return string
+     */
+    protected function evaluatePath($source)
+    {
+        static $theme;
+
+
+        // Make theme to use few features.
+        if (!$theme) {
+            $theme = \App::make('veemo.theme');
+        }
+
+        // Switch path to another theme.
+        if (!is_bool($this->usePath) and $theme->exists($this->usePath)) {
+            $currentTheme = $theme->getThemeName();
+
+            $source = str_replace($currentTheme, $this->usePath, $source);
+        }
+
+
+        return $source;
+    }
+
+    /**
+     * @param null $name
+     * @return $this
+     */
+    public function module($name = null)
+    {
+        if (app('Veemo\Core\Modules\Modules')) {
+
+            $this->module = $name;
+
+        }
+
+        return $this;
+    }
+
+    /**
+     * Force use a theme path.
+     *
+     * @param  boolean $use
+     * @return AssetContainer
+     */
+    public function usePath($use = true)
+    {
+        $this->usePath = $use;
+
+        return $this;
+    }
+
+    /**
+     * Build an HTML attribute string from an array.
+     *
+     * @param  array $attributes
+     * @return string
+     */
+    public function attributes($attributes)
+    {
+        $html = array();
+
+        // For numeric keys we will assume that the key and the value are the same
+        // as this will convert HTML attributes such as "required" to a correct
+        // form like required="required" instead of using incorrect numerics.
+        foreach ((array)$attributes as $key => $value) {
+            $element = $this->attributeElement($key, $value);
+
+            if (!is_null($element)) $html[] = $element;
+        }
+
+        return count($html) > 0 ? ' ' . implode(' ', $html) : '';
+    }
+
+    /**
+     * Build a single attribute element.
+     *
+     * @param  string $key
+     * @param  string $value
+     * @return string
+     */
+    protected function attributeElement($key, $value)
+    {
+        if (is_numeric($key)) $key = $value;
+
+        if (!is_null($value)) return $key . '="' . e($value) . '"';
+    }
+
+    /**
+     * Alias add an asset to container.
+     *
+     * @param string $name
+     * @param string $source
+     * @param array $dependencies
+     * @param array $attributes
+     */
+    public function add($name, $source, $dependencies = array(), $attributes = array())
+    {
+        $this->added($name, $source, $dependencies, $attributes);
+    }
 
     /**
      * Add an asset to the container.
@@ -264,18 +374,39 @@ class AssetContainer
         }
     }
 
+    /**
+     * Add an asset to the array of registered assets.
+     *
+     * @param  string $type
+     * @param  string $name
+     * @param  string $source
+     * @param  array $dependencies
+     * @param  array $attributes
+     * @return void
+     */
+    protected function register($type, $name, $source, $dependencies, $attributes)
+    {
+        $dependencies = (array)$dependencies;
+
+        $attributes = (array)$attributes;
+
+        $this->assets[$type][$name] = compact('source', 'dependencies', 'attributes');
+    }
 
     /**
-     * Alias add an asset to container.
+     * Write a script to the container.
      *
-     * @param string $name
-     * @param string $source
-     * @param array $dependencies
-     * @param array $attributes
+     * @param  string $name
+     * @param  string string
+     * @param  string $source
+     * @param  array $dependencies
+     * @return AssetContainer
      */
-    public function add($name, $source, $dependencies = array(), $attributes = array())
+    public function writeScript($name, $source, $dependencies = array())
     {
-        $this->added($name, $source, $dependencies, $attributes);
+        $source = '<script>' . $source . '</script>';
+
+        return $this->write($name, 'script', $source, $dependencies);
     }
 
     /**
@@ -303,22 +434,6 @@ class AssetContainer
         }
 
         return $this;
-    }
-
-    /**
-     * Write a script to the container.
-     *
-     * @param  string $name
-     * @param  string string
-     * @param  string $source
-     * @param  array $dependencies
-     * @return AssetContainer
-     */
-    public function writeScript($name, $source, $dependencies = array())
-    {
-        $source = '<script>' . $source . '</script>';
-
-        return $this->write($name, 'script', $source, $dependencies);
     }
 
     /**
@@ -411,103 +526,6 @@ class AssetContainer
     }
 
     /**
-     * Evaluate path to current theme or force use theme.
-     *
-     * @param  string $source
-     * @return string
-     */
-    protected function evaluatePath($source)
-    {
-        static $theme;
-
-
-        // Make theme to use few features.
-        if (!$theme) {
-            $theme = \App::make('veemo.theme');
-        }
-
-        // Switch path to another theme.
-        if (!is_bool($this->usePath) and $theme->exists($this->usePath)) {
-            $currentTheme = $theme->getThemeName();
-
-            $source = str_replace($currentTheme, $this->usePath, $source);
-        }
-
-
-        return $source;
-    }
-
-
-    /**
-     * @param null $name
-     * @return $this
-     */
-    public function module($name = null)
-    {
-        if (app('Veemo\Core\Modules\Modules')) {
-
-            $this->module = $name;
-
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * Force use a theme path.
-     *
-     * @param  boolean $use
-     * @return AssetContainer
-     */
-    public function usePath($use = true)
-    {
-        $this->usePath = $use;
-
-        return $this;
-    }
-
-    /**
-     * Check using theme path.
-     *
-     * @return boolean
-     */
-    public function isUsePath()
-    {
-        return (boolean)$this->usePath;
-    }
-
-    /**
-     * Returns the full-path for an asset.
-     *
-     * @param  string $source
-     * @return string
-     */
-    public function path($source)
-    {
-        return $source;
-    }
-
-    /**
-     * Add an asset to the array of registered assets.
-     *
-     * @param  string $type
-     * @param  string $name
-     * @param  string $source
-     * @param  array $dependencies
-     * @param  array $attributes
-     * @return void
-     */
-    protected function register($type, $name, $source, $dependencies, $attributes)
-    {
-        $dependencies = (array)$dependencies;
-
-        $attributes = (array)$attributes;
-
-        $this->assets[$type][$name] = compact('source', 'dependencies', 'attributes');
-    }
-
-    /**
      * Get the links to all of the registered CSS assets.
      *
      * @return  string
@@ -515,16 +533,6 @@ class AssetContainer
     public function styles()
     {
         return $this->group('style');
-    }
-
-    /**
-     * Get the links to all of the registered JavaScript assets.
-     *
-     * @return  string
-     */
-    public function scripts()
-    {
-        return $this->group('script');
     }
 
     /**
@@ -544,94 +552,6 @@ class AssetContainer
         }
 
         return $assets;
-    }
-
-    /**
-     * Get the HTML link to a registered asset.
-     *
-     * @param  string $group
-     * @param  string $name
-     * @return string
-     */
-    protected function asset($group, $name)
-    {
-        if (!isset($this->assets[$group][$name])) return '';
-
-        $asset = $this->assets[$group][$name];
-
-        // If the bundle source is not a complete URL, we will go ahead and prepend
-        // the bundle's asset path to the source provided with the asset. This will
-        // ensure that we attach the correct path to the asset.
-        if (filter_var($asset['source'], FILTER_VALIDATE_URL) === false) {
-            $asset['source'] = $this->path($asset['source']);
-        }
-
-        // If source is not a path to asset, render without wrap a HTML.
-        if (strpos($asset['source'], '<') !== false) {
-            return $asset['source'];
-        }
-
-        // This line fixing config path.
-        $asset['source'] = $this->configAssetUrl($asset['source']);
-
-        //return HTML::$group($asset['source'], $asset['attributes']);
-        return $this->html($group, $asset['source'], $asset['attributes']);
-    }
-
-
-    public function html($group, $source, $attributes)
-    {
-        switch ($group) {
-            case 'script' :
-                $attributes['src'] = $source;
-
-                return '<script' . $this->attributes($attributes) . '></script>' . PHP_EOL;
-            case 'style' :
-
-                $defaults = array('media' => 'all', 'type' => 'text/css', 'rel' => 'stylesheet');
-
-                $attributes = $attributes + $defaults;
-
-                $attributes['href'] = $source;
-
-                return '<link' . $this->attributes($attributes) . '>' . PHP_EOL;
-        }
-    }
-
-    /**
-     * Build an HTML attribute string from an array.
-     *
-     * @param  array $attributes
-     * @return string
-     */
-    public function attributes($attributes)
-    {
-        $html = array();
-
-        // For numeric keys we will assume that the key and the value are the same
-        // as this will convert HTML attributes such as "required" to a correct
-        // form like required="required" instead of using incorrect numerics.
-        foreach ((array)$attributes as $key => $value) {
-            $element = $this->attributeElement($key, $value);
-
-            if (!is_null($element)) $html[] = $element;
-        }
-
-        return count($html) > 0 ? ' ' . implode(' ', $html) : '';
-    }
-
-    /**
-     * Build a single attribute element.
-     *
-     * @param  string $key
-     * @param  string $value
-     * @return string
-     */
-    protected function attributeElement($key, $value)
-    {
-        if (is_numeric($key)) $key = $value;
-
-        if (!is_null($value)) return $key . '="' . e($value) . '"';
     }
 
     /**
@@ -715,6 +635,78 @@ class AssetContainer
         }
 
         return true;
+    }
+
+    /**
+     * Get the HTML link to a registered asset.
+     *
+     * @param  string $group
+     * @param  string $name
+     * @return string
+     */
+    protected function asset($group, $name)
+    {
+        if (!isset($this->assets[$group][$name])) return '';
+
+        $asset = $this->assets[$group][$name];
+
+        // If the bundle source is not a complete URL, we will go ahead and prepend
+        // the bundle's asset path to the source provided with the asset. This will
+        // ensure that we attach the correct path to the asset.
+        if (filter_var($asset['source'], FILTER_VALIDATE_URL) === false) {
+            $asset['source'] = $this->path($asset['source']);
+        }
+
+        // If source is not a path to asset, render without wrap a HTML.
+        if (strpos($asset['source'], '<') !== false) {
+            return $asset['source'];
+        }
+
+        // This line fixing config path.
+        $asset['source'] = $this->configAssetUrl($asset['source']);
+
+        //return HTML::$group($asset['source'], $asset['attributes']);
+        return $this->html($group, $asset['source'], $asset['attributes']);
+    }
+
+    /**
+     * Returns the full-path for an asset.
+     *
+     * @param  string $source
+     * @return string
+     */
+    public function path($source)
+    {
+        return $source;
+    }
+
+    public function html($group, $source, $attributes)
+    {
+        switch ($group) {
+            case 'script' :
+                $attributes['src'] = $source;
+
+                return '<script' . $this->attributes($attributes) . '></script>' . PHP_EOL;
+            case 'style' :
+
+                $defaults = array('media' => 'all', 'type' => 'text/css', 'rel' => 'stylesheet');
+
+                $attributes = $attributes + $defaults;
+
+                $attributes['href'] = $source;
+
+                return '<link' . $this->attributes($attributes) . '>' . PHP_EOL;
+        }
+    }
+
+    /**
+     * Get the links to all of the registered JavaScript assets.
+     *
+     * @return  string
+     */
+    public function scripts()
+    {
+        return $this->group('script');
     }
 
 }

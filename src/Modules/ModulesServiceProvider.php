@@ -21,7 +21,7 @@ class ModulesServiceProvider extends ServiceProvider
 	public function boot()
 	{
 		$this->publishes([
-			__DIR__.'/../Publish/Config/modules.php' => config_path('modules.php'),
+			__DIR__.'/../Publish/Config/modules.php' => config_path('veemo/modules.php'),
 		]);
 
 
