@@ -276,7 +276,6 @@ class Theme
             }
         }
 
-
         if ($viewNamespace == null) {
             throw new UnknownViewFileException(("Theme [$this->active] View [$view] not found."));
         }
@@ -637,7 +636,6 @@ class Theme
 
                 // views/{current_theme}
                 $views['module_base_view'] = "module.{$module}::{$view}";
-
 
                 foreach ($views as $module_view) {
 
