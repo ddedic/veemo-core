@@ -39,6 +39,10 @@ class CoreServiceProvider extends ServiceProvider
             __DIR__ . '/Publish/Config/core.php', 'veemo.core'
         );
 
+        $this->registerServices();
+        
+        $this->registerAliases();
+
         $this->registerNamespaces();
 
         $this->registerModules();
@@ -52,7 +56,31 @@ class CoreServiceProvider extends ServiceProvider
     }
 
 
+    protected function registerServices()
+    {
+        // HTML + FORM
+        $this->app->register('Illuminate\Html\HtmlServiceProvider');
+      
+        
+    }
 
+
+    protected function registerAliases()
+    {
+		$aliases = AliasLoader::getInstance();
+		
+		// FORM
+		$aliases->alias(
+            'Form',
+            'Illuminate\Html\FormFacade'
+        );
+        
+        // HTML
+        $aliases->alias(
+            'Html',
+            'Illuminate\Html\HtmlFacade'
+        );        
+    }
 
 
     protected function registerModules()

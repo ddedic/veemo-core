@@ -31,4 +31,12 @@ class FrontendBaseController extends BaseController {
 
 
 
+    public function test2()
+    {
+        
+        return $this->theme->view('test')->render();
+        
+    }
+
+
 }
