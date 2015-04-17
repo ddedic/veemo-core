@@ -12,7 +12,7 @@
 |
 */
 
-Route::group(['namespace' => 'Veemo\Core\Http\Controllers\Frontend'], function () {
+Route::group(['namespace' => 'App\Modules\Homepage\Http\Controllers\Frontend'], function () {
 
     Route::get('/', ['uses' => 'FrontendController@getHomepage', 'as' => 'frontend.homepage']);
 
@@ -30,7 +30,7 @@ Route::group(['namespace' => 'Veemo\Core\Http\Controllers\Frontend'], function (
 |
 */
 
-Route::group(config('veemo.core.backendRouteSettings'), function () {
+Route::group(['prefix' => config('veemo.core.backendPrefix')], function () {
 
 
     Route::get('/', ['as' => 'backend', 'middleware' => 'auth.backend'], function() {

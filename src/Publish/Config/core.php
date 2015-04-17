@@ -45,26 +45,25 @@ return array(
     */
 
     'backendPrefix' => 'backend',
-    
-    
+
+
+
+
     /*
     |--------------------------------------------------------------------------
-    | Backend route settings
+    | Default Registration Role
     |--------------------------------------------------------------------------
     |
     |
-    | The prefix that will be used for the administration. Usually admin or backend
+    | The default role to assign to registered users.
     |
-    |
+    | Default: app.user
     |
     */
 
-    'backendRouteSettings' => [
-        'prefix'        => 'backend',
-        'domain'        => '',
-        'namespace'     => 'Backend',
-        'middleware'    => 'auth.backend'
-    ]
+    'users_default_role' => 'app.user',
+
+
 
 
 );

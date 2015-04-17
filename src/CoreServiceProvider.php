@@ -53,6 +53,7 @@ class CoreServiceProvider extends ServiceProvider
 
         $this->registerHelpers();
 
+        $this->registerDefaultRoutes();
     }
 
 
@@ -104,6 +105,14 @@ class CoreServiceProvider extends ServiceProvider
             require_once($filename);
         }
     }
+
+
+    public function registerDefaultRoutes()
+    {
+        require (__DIR__ . '/Http/routes.php');
+    }
+
+
 
 
     /**
