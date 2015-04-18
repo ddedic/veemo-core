@@ -32,11 +32,9 @@ Route::group(['namespace' => 'App\Modules\Homepage\Http\Controllers\Frontend'], 
 
 Route::group(['prefix' => config('veemo.core.backendPrefix')], function () {
 
-
-    Route::get('/', ['as' => 'backend', 'middleware' => 'auth.backend'], function() {
+    Route::get('/', function () {
         return redirect()->route('backend.dashboard');
     });
-
 
 });
 

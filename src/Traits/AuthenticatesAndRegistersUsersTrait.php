@@ -4,7 +4,7 @@ use App\Modules\Auth\Models\Role;
 use App\Modules\Auth\Services\Registrar;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
-
+use Session;
 
 
 trait AuthenticatesAndRegistersUsersTrait
@@ -65,17 +65,18 @@ trait AuthenticatesAndRegistersUsersTrait
      */
     public function redirectRoute()
     {
+        return property_exists($this, 'redirectRoute') ? $this->redirectRoute : 'frontend.homepage';
+    }
 
-        if (property_exists($this, 'redirectRoute'))
-        {
-            // if redirectRoute has keyword backend, we'll assume that redirect goes to root backend url path
-            if (preg_match("/backend/i", $this->redirectRoute)) {
-                return config('veemo.core.backendPrefix');//. '.dashboard';
-            }
-        }
 
-        // back to homepage
-        return '/';
+    /**
+     * Get the logout redirect path.
+     *
+     * @return string
+     */
+    public function redirectLogoutRoute()
+    {
+        return property_exists($this, 'redirectLogoutRoute') ? $this->redirectLogoutRoute : 'frontend.homepage';
     }
 
     /**
@@ -97,13 +98,21 @@ trait AuthenticatesAndRegistersUsersTrait
     public function postLogin(Request $request)
     {
         $this->validate($request, [
-            'email' => 'required', 'password' => 'required',
+            'email' => 'required|email', 'password' => 'required',
         ]);
 
         $credentials = $request->only('email', 'password');
 
         if ($this->auth->attempt($credentials, $request->has('remember'))) {
-            return redirect()->intended($this->redirectRoute());
+
+            $intended = Session::pull('url.intended');
+
+            if (is_null($intended))
+            {
+                return redirect()->route($this->redirectRoute());
+            }
+
+            return redirect()->intended($intended);
         }
 
         return redirect()->route($this->loginRoute())
@@ -132,7 +141,7 @@ trait AuthenticatesAndRegistersUsersTrait
     {
         $this->auth->logout();
 
-        return redirect()->route($this->redirectRoute());
+        return redirect()->route($this->redirectLogoutRoute());
     }
 
 }

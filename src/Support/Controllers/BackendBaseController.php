@@ -12,7 +12,7 @@ class BackendBaseController extends BaseController {
             ->uses(config('veemo.core.backendTheme'));
 
 
-        //$this->middleware('auth.backend', ['except' => 'getLogin']);
+        $this->middleware('auth.backend', ['except' => ['getLogin', 'postLogin']]);
 
     }
 
