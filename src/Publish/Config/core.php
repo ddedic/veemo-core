@@ -19,6 +19,21 @@ return array(
 
     /*
     |--------------------------------------------------------------------------
+    | Frontend force ssl
+    |--------------------------------------------------------------------------
+    |
+    |
+    | Do we force frontend on https protocol?
+    |
+    | Default: false
+    |
+    */
+
+    'frontendForceSsl' => false,
+
+
+    /*
+    |--------------------------------------------------------------------------
     | Backend theme
     |--------------------------------------------------------------------------
     |
@@ -47,6 +62,49 @@ return array(
     'backendPrefix' => 'backend',
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | Backend force ssl
+    |--------------------------------------------------------------------------
+    |
+    |
+    | Do we force backend on https protocol?
+    |
+    | Default: false
+    |
+    */
+
+    'backendForceSsl' => false,
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Allow backend access before auth
+    |--------------------------------------------------------------------------
+    |
+    |
+    | Do we allow any user that is not authenticated on frontend to access backend?
+    |
+    | Default: true
+    |
+    */
+
+    'allowBackendAccessBeforeAuth' => true,
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Admin use role
+    |--------------------------------------------------------------------------
+    |
+    |
+    | The default role to assigned to admin user.
+    |
+    | Default: app.user
+    |
+    */
+
+    'users_default_admin_role' => 'app.admin',
 
 
     /*
@@ -61,9 +119,7 @@ return array(
     |
     */
 
-    'users_default_role' => 'app.user',
-
-
+    'users_default_user_role' => 'app.user',
 
 
 );

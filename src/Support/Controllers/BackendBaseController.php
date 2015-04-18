@@ -13,6 +13,7 @@ class BackendBaseController extends BaseController {
 
 
         $this->middleware('auth.backend', ['except' => ['getLogin', 'postLogin']]);
+        $this->middleware('backend.force.ssl');
 
     }
 

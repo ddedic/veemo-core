@@ -3,6 +3,8 @@
 use App, Config, Lang, View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\AliasLoader;
+use Illuminate\Routing\Router;
+
 
 
 class CoreServiceProvider extends ServiceProvider
@@ -12,6 +14,17 @@ class CoreServiceProvider extends ServiceProvider
      * @var bool $defer Indicates if loading of the provider is deferred.
      */
     protected $defer = false;
+
+
+    /**
+     * The filters base class name.
+     *
+     * @var array
+     */
+    protected $middlewares = [
+        'backend.force.ssl'       => 'BackendForceSslMiddleware',
+        'frontend.force.ssl'      => 'FrontendForceSslMiddleware'
+    ];
 
 
 
@@ -54,6 +67,8 @@ class CoreServiceProvider extends ServiceProvider
         $this->registerHelpers();
 
         $this->registerDefaultRoutes();
+
+        $this->registerMiddlewares($this->app->router);
     }
 
 
@@ -113,6 +128,14 @@ class CoreServiceProvider extends ServiceProvider
     }
 
 
+
+    public function registerMiddlewares(Router $router)
+    {
+        foreach ($this->middlewares as $name => $middleware) {
+            $class = "Veemo\\Core\\Http\\Middleware\\{$middleware}";
+            $router->middleware($name, $class);
+        }
+    }
 
 
     /**
