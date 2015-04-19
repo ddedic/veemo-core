@@ -29,7 +29,7 @@ return array(
     |
     */
 
-    'frontendForceSsl' => false,
+    'frontendForceSsl' => env('FRONTEND_FORCE_SSL', false),
 
 
     /*
@@ -74,7 +74,7 @@ return array(
     |
     */
 
-    'backendForceSsl' => false,
+    'backendForceSsl' => env('BACKEND_FORCE_SSL', false),
 
 
     /*

@@ -7,13 +7,15 @@ class BackendBaseController extends BaseController {
 
     public function __construct()
     {
+
+        // Setup backend theme
         $this->theme = app('veemo.theme')
             ->backend()
             ->uses(config('veemo.core.backendTheme'));
 
-
-        $this->middleware('auth.backend', ['except' => ['getLogin', 'postLogin']]);
+        // Setup middleware
         $this->middleware('backend.force.ssl');
+        $this->middleware('auth.backend', ['except' => ['getLogin', 'postLogin']]);
 
     }
 
