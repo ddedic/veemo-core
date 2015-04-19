@@ -101,8 +101,8 @@ class CoreServiceProvider extends ServiceProvider
 
     protected function registerModules()
     {
-        $this->app->register('Veemo\Core\Modules\ModulesServiceProvider');
-        AliasLoader::getInstance()->alias('Module', 'Veemo\Core\Modules\Facades\Module');
+        $this->app->register('Veemo\Modules\ModulesServiceProvider');
+        AliasLoader::getInstance()->alias('Module', 'Veemo\Modules\Facades\Module');
     }
 
 

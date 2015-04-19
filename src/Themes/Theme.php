@@ -593,7 +593,7 @@ class Theme
      */
     protected function getModuleView($view)
     {
-        if (app('Veemo\Core\Modules\Modules')) {
+        if (app('Veemo\Modules\Modules')) {
 
             $viewSegments = explode('.', $view);
             $moduleViewNamespace = null;
