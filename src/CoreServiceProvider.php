@@ -108,8 +108,8 @@ class CoreServiceProvider extends ServiceProvider
 
     protected function registerThemes()
     {
-        $this->app->register('Veemo\Core\Themes\ThemeServiceProvider');
-        AliasLoader::getInstance()->alias('Theme', 'Veemo\Core\Themes\Facades\Theme');
+        $this->app->register('Veemo\Themes\ThemeServiceProvider');
+        AliasLoader::getInstance()->alias('Theme', 'Veemo\Themes\Facades\Theme');
     }
 
 
