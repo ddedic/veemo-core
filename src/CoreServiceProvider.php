@@ -53,10 +53,10 @@ class CoreServiceProvider extends ServiceProvider
         );
 
         $this->registerServices();
-        
-        $this->registerAliases();
 
         $this->registerNamespaces();
+
+        $this->registerAuth();
 
         $this->registerModules();
 
@@ -76,28 +76,30 @@ class CoreServiceProvider extends ServiceProvider
     {
         // HTML + FORM
         $this->app->register('Illuminate\Html\HtmlServiceProvider');
-      
-        
-    }
 
+        $aliases = AliasLoader::getInstance();
 
-    protected function registerAliases()
-    {
-		$aliases = AliasLoader::getInstance();
-		
-		// FORM
-		$aliases->alias(
+        // FORM
+        $aliases->alias(
             'Form',
             'Illuminate\Html\FormFacade'
         );
-        
+
         // HTML
         $aliases->alias(
             'Html',
             'Illuminate\Html\HtmlFacade'
-        );        
+        );
+
+
     }
 
+
+    protected function registerAuth()
+    {
+        $this->app->register('Veemo\Auth\AuthServiceProvider');
+        //AliasLoader::getInstance()->alias('VAuth', 'Veemo\Auth\Facades\VAuth');
+    }
 
     protected function registerModules()
     {

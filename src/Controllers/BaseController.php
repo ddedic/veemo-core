@@ -1,4 +1,4 @@
-<?php namespace Veemo\Core\Support\Controllers;
+<?php namespace Veemo\Core\Controllers;
 
 
 use Illuminate\Foundation\Bus\DispatchesCommands;
