@@ -31,9 +31,7 @@
         "psr-4": {
             "Veemo\\Core\\": "src"
         },
-        "classmap": [
-            "src/Themes/Exceptions/Exceptions.php"
-        ],
+
 
         "files": [
 
