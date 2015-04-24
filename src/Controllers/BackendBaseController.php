@@ -15,7 +15,7 @@ class BackendBaseController extends BaseController {
 
         // Setup middleware
         $this->middleware('backend.force.ssl');
-        $this->middleware('auth.backend', ['except' => ['getLogin', 'postLogin']]);
+        $this->middleware('auth.backend', ['except' => ['getLogin', 'postLogin', 'getEmail', 'postEmail', 'getReset', 'postReset']]);
 
     }
 

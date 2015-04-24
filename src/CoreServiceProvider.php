@@ -74,10 +74,11 @@ class CoreServiceProvider extends ServiceProvider
 
     protected function registerServices()
     {
+        $aliases = AliasLoader::getInstance();
+
+
         // HTML + FORM
         $this->app->register('Illuminate\Html\HtmlServiceProvider');
-
-        $aliases = AliasLoader::getInstance();
 
         // FORM
         $aliases->alias(
@@ -91,6 +92,14 @@ class CoreServiceProvider extends ServiceProvider
             'Illuminate\Html\HtmlFacade'
         );
 
+
+        // FLASH Notifications
+        $this->app->register('Laracasts\Flash\FlashServiceProvider');
+        // Flash facade
+        $aliases->alias(
+            'Flash',
+            'Illuminate\Html\HtmlFacad'
+        );
 
     }
 
