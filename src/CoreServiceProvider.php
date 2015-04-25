@@ -68,6 +68,8 @@ class CoreServiceProvider extends ServiceProvider
 
         $this->registerDefaultRoutes();
 
+        $this->setupOverrides();
+
         $this->registerMiddlewares($this->app->router);
     }
 
@@ -146,6 +148,17 @@ class CoreServiceProvider extends ServiceProvider
             $class = "Veemo\\Core\\Http\\Middleware\\{$middleware}";
             $router->middleware($name, $class);
         }
+    }
+
+    public function setupOverrides()
+    {
+
+        // Flash CSRF exception and redirect back to form
+        $this->app->bind(
+            'App\Http\Middleware\VerifyCsrfToken',
+            'Veemo\Core\Http\Middleware\VerifyCsrfToken'
+        );
+
     }
 
 
