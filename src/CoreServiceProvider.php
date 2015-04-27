@@ -97,6 +97,7 @@ class CoreServiceProvider extends ServiceProvider
 
         // FLASH Notifications
         $this->app->register('Laracasts\Flash\FlashServiceProvider');
+
         // Flash facade
         $aliases->alias(
             'Flash',
@@ -115,7 +116,7 @@ class CoreServiceProvider extends ServiceProvider
     protected function registerModules()
     {
         $this->app->register('Veemo\Modules\ModulesServiceProvider');
-        AliasLoader::getInstance()->alias('Module', 'Veemo\Modules\Facades\Module');
+        AliasLoader::getInstance()->alias('Modules', 'Veemo\Modules\Facades\Modules');
     }
 
 

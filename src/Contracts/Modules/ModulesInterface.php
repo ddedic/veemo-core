@@ -12,7 +12,7 @@ namespace Veemo\Core\Contracts\Modules;
 
 interface ModulesInterface {
 
-    public function install($slug);
+    public function install($slug, $enable);
 
     public function uninstall($slug);
 
@@ -22,10 +22,8 @@ interface ModulesInterface {
 
     public function register($slug);
 
-    public function registerCoreModules();
-
-    public function registerAddonModules();
-
     public function registerModules();
+
+    public function getManager();
 
 } 

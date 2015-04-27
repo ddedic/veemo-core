@@ -186,6 +186,23 @@ abstract class BaseRepository implements BaseRepositoryInterface {
     {
         $this->newQuery()->eagerLoad()->setClauses()->setScopes();
 
+        $model = $this->query->first();
+
+        $this->unsetClauses();
+
+        return $model;
+    }
+
+
+    /**
+     * Get the first specified model record from the database
+     *
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function firstOrFail()
+    {
+        $this->newQuery()->eagerLoad()->setClauses()->setScopes();
+
         $model = $this->query->firstOrFail();
 
         $this->unsetClauses();
@@ -419,5 +436,16 @@ abstract class BaseRepository implements BaseRepositoryInterface {
         $this->take     = null;
 
         return $this;
+    }
+
+
+    /**
+     * Get model instance
+     *
+     * @return $this
+     */
+    public function getModel()
+    {
+        return $this->model;
     }
 }
