@@ -20,7 +20,7 @@ interface ModulesInterface {
 
     public function disable($slug);
 
-    public function register($slug);
+    public function register($module);
 
     public function registerModules();
 
