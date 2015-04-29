@@ -4,11 +4,18 @@ use App, Config, Lang, View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Routing\Router;
+use Illuminate\Foundation\Bus\DispatchesCommands;
+
+use Veemo\Core\Command\ConfigureCommandBus;
+use Veemo\Core\Command\InitializeApplication;
 
 
 
 class CoreServiceProvider extends ServiceProvider
 {
+
+    use DispatchesCommands;
+
 
     /**
      * @var bool $defer Indicates if loading of the provider is deferred.
@@ -30,12 +37,15 @@ class CoreServiceProvider extends ServiceProvider
 
     public function boot()
     {
-
         // Publish config.
         $this->publishes([
             __DIR__ . '/Publish/Config/core.php' => config_path('veemo/core.php'),
         ]);
 
+
+
+        $this->dispatch(new ConfigureCommandBus());
+        $this->dispatch(new InitializeApplication());
 
     }
 
@@ -51,6 +61,16 @@ class CoreServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             __DIR__ . '/Publish/Config/core.php', 'veemo.core'
         );
+
+
+        /**
+         * This is used often, make it a singleton.
+         */
+        $this->app->singleton(
+            'Veemo\Core\Model\BaseEloquentObserver',
+            'Veemo\Core\Model\BaseEloquentObserver'
+        );
+
 
         $this->registerServices();
 

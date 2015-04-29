@@ -12,7 +12,7 @@
 |
 */
 
-Route::group(['namespace' => 'App\Modules\Homepage\Http\Controllers\Frontend'], function () {
+Route::group(['namespace' => 'App\Modules\Core\Homepage\Http\Controllers\Frontend'], function () {
 
     Route::get('/', ['uses' => 'FrontendController@getHomepage', 'as' => 'frontend.homepage']);
 

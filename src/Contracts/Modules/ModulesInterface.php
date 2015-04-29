@@ -14,13 +14,13 @@ interface ModulesInterface {
 
     public function install($slug, $enable);
 
-    public function uninstall($slug);
+    public function uninstall($slug, $force);
 
     public function enable($slug);
 
     public function disable($slug);
 
-    public function register($module);
+    public function register($slug);
 
     public function registerModules();
 
