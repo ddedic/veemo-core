@@ -7,9 +7,10 @@ use Illuminate\Routing\Router;
 use Illuminate\Foundation\Bus\DispatchesCommands;
 
 use Veemo\Core\Command\ConfigureCommandBus;
-use Veemo\Core\Command\InitializeApplication;
-
-
+use Veemo\Core\Command\CheckInstaller;
+use Veemo\Core\Command\RegisterModules;
+use Veemo\Core\Command\RegisterDefaultRoutes;
+use Veemo\Core\Command\BuildMainBackendMenu;
 
 class CoreServiceProvider extends ServiceProvider
 {
@@ -43,9 +44,20 @@ class CoreServiceProvider extends ServiceProvider
         ]);
 
 
-
+        // ON BOOT
         $this->dispatch(new ConfigureCommandBus());
-        $this->dispatch(new InitializeApplication());
+        $this->dispatch(new CheckInstaller());
+
+
+
+        // ON BOOTED
+        $this->app->booted(function ($app) {
+
+            $this->dispatch(new RegisterModules());
+            $this->dispatch(new RegisterDefaultRoutes());
+            $this->dispatch(new BuildMainBackendMenu());
+
+        });
 
     }
 
@@ -72,9 +84,19 @@ class CoreServiceProvider extends ServiceProvider
         );
 
 
-        $this->registerServices();
+        // AFTER SETTINGS MODULE
+        /**
+         * Register our own exception handler. This will let
+         * us intercept exceptions and make them pretty if
+         * not in debug mode.
+         */
+        //$this->app->bind(
+        //    'Illuminate\Contracts\Debug\ExceptionHandler',
+        //    'Veemo\Core\Exception\ExceptionHandler'
+        //);
 
-        $this->registerNamespaces();
+
+        $this->registerServices();
 
         $this->registerAuth();
 
@@ -86,11 +108,15 @@ class CoreServiceProvider extends ServiceProvider
 
         $this->registerHelpers();
 
-        $this->registerDefaultRoutes();
-
         $this->setupOverrides();
 
-        $this->registerMiddlewares($this->app->router);
+        $this->app->booted(function ($app) {
+
+            $this->registerMiddlewares($app->router);
+
+        });
+
+
     }
 
 
@@ -100,18 +126,18 @@ class CoreServiceProvider extends ServiceProvider
 
 
         // HTML + FORM
-        $this->app->register('Illuminate\Html\HtmlServiceProvider');
+        $this->app->register('Collective\Html\HtmlServiceProvider');
 
         // FORM
         $aliases->alias(
             'Form',
-            'Illuminate\Html\FormFacade'
+            'Collective\Html\FormFacade'
         );
 
         // HTML
         $aliases->alias(
             'Html',
-            'Illuminate\Html\HtmlFacade'
+            'Collective\Html\HtmlFacade'
         );
 
 
@@ -121,7 +147,17 @@ class CoreServiceProvider extends ServiceProvider
         // Flash facade
         $aliases->alias(
             'Flash',
-            'Illuminate\Html\HtmlFacad'
+            'Laracasts\Flash\Flash'
+        );
+
+
+        // Caffeinated Menus Service Provider
+        $this->app->register('Caffeinated\Menus\MenusServiceProvider');
+
+        // Caffeinated Menus Facade
+        $aliases->alias(
+            'Menu',
+            'Caffeinated\Menus\Facades\Menu'
         );
 
     }
@@ -130,13 +166,20 @@ class CoreServiceProvider extends ServiceProvider
     protected function registerAuth()
     {
         $this->app->register('Veemo\Auth\AuthServiceProvider');
-        //AliasLoader::getInstance()->alias('VAuth', 'Veemo\Auth\Facades\VAuth');
     }
 
     protected function registerModules()
     {
         $this->app->register('Veemo\Modules\ModulesServiceProvider');
         AliasLoader::getInstance()->alias('Modules', 'Veemo\Modules\Facades\Modules');
+
+        /*
+        $this->app->booted(function ($app) {
+
+           $app->make('veemo.modules')->registerModules();
+
+        });
+        */
     }
 
 
@@ -153,12 +196,6 @@ class CoreServiceProvider extends ServiceProvider
         foreach (glob(__DIR__ . '/Helpers/*Helper.php') as $filename){
             require_once($filename);
         }
-    }
-
-
-    public function registerDefaultRoutes()
-    {
-        require (__DIR__ . '/Http/routes.php');
     }
 
 
@@ -182,18 +219,6 @@ class CoreServiceProvider extends ServiceProvider
 
     }
 
-
-    /**
-     * Register the Core module resource namespaces.
-     *
-     * @return void
-     */
-    protected function registerNamespaces()
-    {
-
-        //
-
-    }
 
 
     /**

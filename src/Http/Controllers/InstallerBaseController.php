@@ -1,4 +1,4 @@
-<?php namespace Veemo\Core\Controllers;
+<?php namespace Veemo\Core\Http\Controllers;
 
 
 

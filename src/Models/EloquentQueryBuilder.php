@@ -38,12 +38,6 @@ class EloquentQueryBuilder extends Builder
         $this->rememberIndex();
 
         if ($this->model->getCacheMinutes()) {
-            if ($this->debug)
-            {
-                \Log::info("Caching [{$this->getCacheKey()}]:");
-                \Log::info($columns);
-            }
-
             return app('cache')->remember(
                 $this->getCacheKey(),
                 $this->model->getCacheMinutes(),
@@ -64,7 +58,9 @@ class EloquentQueryBuilder extends Builder
     protected function rememberIndex()
     {
         if ($this->model->getCacheMinutes()) {
+
             $this->indexCacheCollection();
+
         }
 
         return $this;
@@ -77,10 +73,17 @@ class EloquentQueryBuilder extends Builder
      */
     protected function indexCacheCollection()
     {
-        (new CacheCollection())
+        $cache_collection = (new CacheCollection())
             ->make([$this->getCacheKey()])
             ->setKey($this->model->getCacheCollectionKey())
             ->index();
+
+        if ($this->debug)
+        {
+            \Log::info('Caching:');
+            \Log::info($cache_collection);
+        }
+
 
         return $this;
     }
