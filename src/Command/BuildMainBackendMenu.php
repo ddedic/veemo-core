@@ -68,7 +68,6 @@ class BuildMainBackendMenu implements SelfHandling
             // SORT
             $backendMenu->sortBy('order', 'asc');
 
-            //dd($app);
             //dd(app('events'));
 
 

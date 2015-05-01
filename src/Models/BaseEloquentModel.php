@@ -129,4 +129,5 @@ class BaseEloquentModel extends Model implements Arrayable {
 
 
 
+
 } 

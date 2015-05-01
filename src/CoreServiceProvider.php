@@ -12,6 +12,7 @@ use Veemo\Core\Command\RegisterModules;
 use Veemo\Core\Command\RegisterDefaultRoutes;
 use Veemo\Core\Command\BuildMainBackendMenu;
 
+
 class CoreServiceProvider extends ServiceProvider
 {
 
@@ -59,6 +60,8 @@ class CoreServiceProvider extends ServiceProvider
 
         });
 
+
+
     }
 
 
@@ -94,6 +97,8 @@ class CoreServiceProvider extends ServiceProvider
         //    'Illuminate\Contracts\Debug\ExceptionHandler',
         //    'Veemo\Core\Exception\ExceptionHandler'
         //);
+
+
 
 
         $this->registerServices();
